@@ -25,6 +25,15 @@
                                             </span>
                                         @enderror
                                 </div>
+                                  <div class="col-md-12 mb-2">
+                                    <label for="rank"> Rank <span class="text-danger">*</span> </label>
+                                    <input type="number" name="rank_id" value="{{ old('rank_id') }}"  class="form-control form-control-sm shadow-none @error('rank_id') is-invalid @enderror" id="rank" placeholder="Enter rank">
+                                        @error('rank_id')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                </div>
                                 <div class="col-md-12 mb-2">
                                     <label for="details"> Details <span class="text-danger">*</span> </label>
                                     <textarea name="details" class="form-control" id="description" cols="30" rows="2"></textarea>     

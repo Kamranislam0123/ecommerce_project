@@ -39,6 +39,9 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+
+
+
     public function create()
     {
         $color = Color::all();
@@ -61,7 +64,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        //  dd(vars: $request->all());
         $request->validate([
             'name' => 'required|max:100',
             'category_id' => 'required',
@@ -73,6 +76,7 @@ class ProductController extends Controller
             'otherImage' => 'max:500',
             'purchage' => 'required|min:1|max:10',
         ]);
+        
         $slug = Str::slug($request->name . '-' . time());
         $i = 0;
         while (true) {
@@ -83,7 +87,6 @@ class ProductController extends Controller
             }
             break;
         }
-
         try{
             // DB::beginTransaction();
             $productCode = $this->generateCode('Product', 'P');
@@ -115,35 +118,38 @@ class ProductController extends Controller
             $product->save_by = 1;
             $product->ip_address = $request->ip();
             $product->save();
+// dd(vars: $request->all());
 
-            $productImages = $this->imageUpload($request, 'otherImage', 'uploads/otherImage');
-            if (is_array($productImages) && count($productImages)) {
-                foreach ($productImages as $image) {
-                    $imagePath = new ProductImage();
-                    $imagePath->product_id = $product->id;
-                    $imagePath->otherImage = $image;
-                    $imagePath->save();
-                }
-            }
+
+            // $productImages = $this->imageUpload($request, 'otherImage', 'uploads/otherImage');
+            // if (is_array($productImages) && count($productImages)) {
+            //     foreach ($productImages as $image) {
+            //         $imagePath = new ProductImage();
+            //         $imagePath->product_id = $product->id;
+            //         $imagePath->otherImage = $image;
+            //         $imagePath->save();
+            //     }
+            // }
             
-                $purchage = new Inventory();
-                $purchage->product_id = $product->id;
-                $purchage->purchage = $request->purchage;
-                $purchage->save();
-                if ($product) {
-                Session::flash('success', 'Product Added Successfully');
-                return back();
-            }
-            else{
-                Session::flash('error', 'Product can not be added');
-                return back();
-            }
+            //     $purchage = new Inventory();
+            //     $purchage->product_id = $product->id;
+            //     $purchage->purchage = $request->purchage;
+            //     $purchage->save();
+            //     if ($product) {
+            //     Session::flash('success', 'Product Added Successfully');
+            //     return back();
+            // }
+            // else{
+            //     Session::flash('error', 'Product can not be added');
+            //     return back();
+            // }
 
         }
         catch (Exception $e) {
-            DB::rollBack();
-            Session::flash('faild', 'order Submit faild');
-            return back();
+            return $e->getMessage();
+            // DB::rollBack();
+            // Session::flash('faild', 'order Submit faild');
+            // return back();
         }
         
     }

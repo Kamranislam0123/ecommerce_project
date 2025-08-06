@@ -48,10 +48,10 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $request->validate([
             'name' => ['required', 'max:100', Rule::unique('categories')->whereNull('deleted_at')],
-
+            'rank_id' => 'required|numeric',
             'image' => 'required|max:1000||Image|mimes:jpg,png,jpeg,bmp,webp',
             'ip_address' => 'max:15'
         ]);
@@ -67,6 +67,7 @@ class CategoryController extends Controller
             $slug = Str::slug($request->name . '-' . time());
             $category = new Category();
             $category->name = $request->name;
+            $category->rank_id = $request->rank_id;
             $category->slug = $slug;
             $category->details = $request->details;
             $category->image = $imageNameWithPath;
@@ -80,7 +81,8 @@ class CategoryController extends Controller
             }
         } catch (\Throwable $th) {
             Session::flash('error', 'Opps! category Added Fail');
-            return redirect()->back();
+            // return redirect()->back();
+            return $th->getMessage();
         }
         // dd($request->all());
 
@@ -116,33 +118,32 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        // dd($request->all());
+public function update(Request $request, $id)
+{
+    try {
+        // Validate the input data
         $request->validate([
             'name' => 'max:100',
-            'image' => 'Image|mimes:jpg,png,jpeg,bmp',
+            'rank_id' => 'required|numeric',
+            'image' => 'image|mimes:jpg,png,jpeg,bmp',
             'ip_address' => 'max:15'
         ]);
+
+        // Find the category by ID
         $category = Category::find($id);
+
+        // Check for duplicate category name
         $duplicate = Category::where('id', '!=', $id)->where('name', $request->name)->get();
 
-       
-        // $phone->code = rand(4);
-        // $pone->save();
-        
-        // If($only (,phoe-,code) )
-
-
-
-
-
+        // If duplicate found, flash message and return back
         if (count($duplicate) > 0) {
-            Session::flash('duplicate', ' Duplicate Category');
+            Session::flash('duplicate', 'Duplicate Category');
             return back();
         } else {
+            // Handle image upload if provided
             $categoryImage = '';
             if ($request->hasFile('image')) {
+                // Delete the old image if it exists
                 if (!empty($category->image) && file_exists($category->image)) {
                     unlink($category->image);
                 }
@@ -150,6 +151,8 @@ class CategoryController extends Controller
             } else {
                 $categoryImage = $category->image;
             }
+
+            // Generate a unique slug
             $slug = Str::slug($request->name . '-' . time());
             $i = 0;
             while (true) {
@@ -160,22 +163,37 @@ class CategoryController extends Controller
                 }
                 break;
             }
+
+            // Update category details
             $category->name = $request->name;
+            $category->rank_id = $request->rank_id;
             $category->slug = $slug;
             $category->details = $request->details;
-            $category->updated_by = Auth::user()->user_id;;
+            $category->updated_by = Auth::user()->user_id;
             $category->ip_address = $request->ip();
             $category->image = $categoryImage;
             $category->save();
+
+            // Check if the category was updated successfully
             if ($category) {
-                Session::flash('success', 'category Update Successfully');
+                Session::flash('success', 'Category Updated Successfully');
                 return redirect()->route('category.index');
             } else {
-                Session::flash('error', 'Update Fail');
-                return redirect()->bacK();
+                Session::flash('error', 'Update Failed');
+                return redirect()->back();
             }
         }
+
+    } catch (\Throwable $th) {
+        // Catch any exception or error and log it
+        \Log::error('Error in Category update: ' . $th->getMessage());
+        
+        // Return a user-friendly error message
+        Session::flash('error', 'An error occurred while updating the category');
+        return redirect()->back();
     }
+}
+
 
     /**
      * Remove the specified resource from storage.
@@ -187,7 +205,7 @@ class CategoryController extends Controller
     {
         $product = Product::where('category_id', $category->id)->count();
         $sub = SubCategory::where('category_id', $category->id)->count();
-        if ($product > 0 OR $sub > 0) {
+        if ($product > 0 or $sub > 0) {
             Session::flash('delete_check', 'Delete First dependency subcategory or product');
             return back();
         } else {
@@ -207,19 +225,18 @@ class CategoryController extends Controller
 
     public function  rank()
     {
-        $category = Category::orderBy('rank_id','ASC')->get();
-        return view('admin.category.rank',compact('category'));
+        $category = Category::orderBy('rank_id', 'ASC')->get();
+        return view('admin.category.rank', compact('category'));
     }
 
     public function rankStore(Request $request)
     {
-       
+
         $count = count($request->rank_id);
-        for($i = 0; $i< $count; $i++){
-            
-             Category::where('id',$request->id[$i])->update(['rank_id'=> $request->rank_id[$i]]);
+        for ($i = 0; $i < $count; $i++) {
+
+            Category::where('id', $request->id[$i])->update(['rank_id' => $request->rank_id[$i]]);
         }
         return back();
-        
     }
 }
