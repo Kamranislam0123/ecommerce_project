@@ -65,7 +65,7 @@
                                       <td class="text-center">{{ $item->code }}</td>
                                       <td class="text-right">{{ $item->price }}</td>
                                       <td class="text-right">{{ $item->discount }}</td>
-                                      <td class="text-right">{{$item->inventory['purchage']}}</td>
+                                      <td class="text-right">{{ $item->inventory ? $item->inventory['purchage'] : 'N/A' }}</td>
                                       <td class="text-center"><img src="{{ asset('uploads/product/thumbnail/'.$item->thum_image) }}" class="tbl-image" alt=""></td>
                                      
                                       <td class="text-center" width="15%">
@@ -110,7 +110,7 @@
                           <td style="text-align: center;border:1px solid #000 " >{{ $item->code }}</td>
                           <td style="text-align: center;border:1px solid #000 " >{{ $item->price }}</td>
                           <td style="text-align: center;border:1px solid #000 " >{{ $item->discount }}</td>
-                          <td style="text-align: center;border:1px solid #000 " >{{$item->inventory['purchage']}}</td>
+                          <td style="text-align: center;border:1px solid #000 " >{{ $item->inventory ? $item->inventory['purchage'] : 'N/A' }}</td>
                          
                       </tr>
                 @endforeach
