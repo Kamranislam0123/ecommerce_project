@@ -118,38 +118,36 @@ class ProductController extends Controller
             $product->save_by = 1;
             $product->ip_address = $request->ip();
             $product->save();
-// dd(vars: $request->all());
 
+            // Create inventory record for the product
+            $purchage = new Inventory();
+            $purchage->product_id = $product->id;
+            $purchage->purchage = $request->purchage;
+            $purchage->save();
 
-            // $productImages = $this->imageUpload($request, 'otherImage', 'uploads/otherImage');
-            // if (is_array($productImages) && count($productImages)) {
-            //     foreach ($productImages as $image) {
-            //         $imagePath = new ProductImage();
-            //         $imagePath->product_id = $product->id;
-            //         $imagePath->otherImage = $image;
-            //         $imagePath->save();
-            //     }
-            // }
-            
-            //     $purchage = new Inventory();
-            //     $purchage->product_id = $product->id;
-            //     $purchage->purchage = $request->purchage;
-            //     $purchage->save();
-            //     if ($product) {
-            //     Session::flash('success', 'Product Added Successfully');
-            //     return back();
-            // }
-            // else{
-            //     Session::flash('error', 'Product can not be added');
-            //     return back();
-            // }
+            // Handle multiple images if uploaded
+            $productImages = $this->imageUpload($request, 'otherImage', 'uploads/otherImage');
+            if (is_array($productImages) && count($productImages)) {
+                foreach ($productImages as $image) {
+                    $imagePath = new ProductImage();
+                    $imagePath->product_id = $product->id;
+                    $imagePath->otherImage = $image;
+                    $imagePath->save();
+                }
+            }
+
+            if ($product) {
+                Session::flash('success', 'Product Added Successfully');
+                return redirect()->route('product.index');
+            } else {
+                Session::flash('error', 'Product can not be added');
+                return back();
+            }
 
         }
         catch (Exception $e) {
-            return $e->getMessage();
-            // DB::rollBack();
-            // Session::flash('faild', 'order Submit faild');
-            // return back();
+            Session::flash('error', 'Product can not be added: ' . $e->getMessage());
+            return back();
         }
         
     }
@@ -277,11 +275,11 @@ class ProductController extends Controller
                 $inventory->save();
             }
             if($product){
-                Session::flash('updated', 'success');
+                Session::flash('success', 'Product Updated Successfully');
                 return redirect()->route('product.index');
             }
             else {
-                Session::flash('errors', 'something went wrong');
+                Session::flash('error', 'Something went wrong');
                 return redirect()->back();
             }
         
@@ -307,7 +305,8 @@ class ProductController extends Controller
         }
         Inventory::where('product_id',$id)->delete();
         $product->delete();
-            return back()->with('success','product deleted successfully');
+        Session::flash('success', 'Product deleted successfully');
+        return back();
         
     }
 }
