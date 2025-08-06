@@ -24,6 +24,12 @@
                             <div class="col-md-9">
                                 <input type="text" name="name" value="{{ $category->name }}" class="form-control">
                             </div>
+                             <div class="col-md-3">
+                                <label>Rank </label>
+                            </div>
+                            <div class="col-md-9">
+                                <input type="number" name="rank_id" value="{{ $category->rank_id }}" class="form-control">
+                            </div>
                             <div class="col-md-3">
                                 <label>Details</label>
                             </div>

@@ -36,7 +36,7 @@ class AuthController extends Controller
       
       if (Auth::attempt($credential)) {
         // $pin = rand(11111,999999);
-        $user = User::where('id', Auth::user()->id)->first();
+        $user = User::where('id', operator: Auth::user()->id)->first();
         // $user->status = '0';
         // $user->otp = $pin;
          $user->status = '1';

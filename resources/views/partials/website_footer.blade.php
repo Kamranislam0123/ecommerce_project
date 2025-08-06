@@ -63,9 +63,9 @@
                         55/B, Purana Polton, Noakhali tower, Level 3 &amp; 9, Dhaka -1000
                     </p>
                     <p class=""><b>Email: </b>  
-                        <a class="" href="mailto: Support@corporatetechbd.com"
+                        <a class="" href="mailto: Support@datascapeit.com"
                             style="color: #fff;text-transform:lowercase;" target="_blank">
-                            Support@corporatetechbd.com</a>
+                            Support@datascapeit.com</a>
                     </p>
                 </div>
             </div>
