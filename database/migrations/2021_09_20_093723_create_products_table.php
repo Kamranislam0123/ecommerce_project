@@ -31,7 +31,7 @@ class CreateProductsTable extends Migration
             $table->text('thum_image')->nullable();
             $table->decimal('discount', 18,2)->nullable();
             $table->string('product_size', 10)->nullable();
-            $
+            
             $table->string('color', 20)->nullable();
             $table->text('short_details')->nullable();
             $table->text('description')->nullable();
