@@ -79,7 +79,7 @@
 
                                   <div class="col-md-8">
                                     
-                                      <input type="number" name="purchage" id="purchage" value="{{$product->inventory['purchage'] }}"  placeholder="Enter Stock" class="form-control my-form-control @error('purchage') is-invalid @enderror">      
+                                                                             <input type="number" name="purchage" id="purchage" value="{{ $product->inventory ? $product->inventory['purchage'] : '' }}"  placeholder="Enter Stock" class="form-control my-form-control @error('purchage') is-invalid @enderror">      
                                      
                                           @error('purchage')
                                           <span class="invalid-feedback" role="alert">
