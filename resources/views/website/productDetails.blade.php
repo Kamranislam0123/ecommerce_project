@@ -25,7 +25,7 @@
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-8">
                         <p class="product-title fw-b fs-3">{{$product->name}}</p>
-                        @if ($product->inventory->purchage > 0)
+                        @if ($product->inventory && $product->inventory->purchage > 0)
                         <p><span class="avilability"> Availability :</span><span class="in-stock"> In Stock </span></p>
                         @else
                         <p><span class="avilability"> Availability :</span><span class="in-stock">Stock Out </span></p>
@@ -36,7 +36,7 @@
                            $discount_rate = $product->price - $product_discount;
                            
                        @endphp
-                       @if ($product->inventory->purchage < 1)
+                       @if ($product->inventory && $product->inventory->purchage < 1)
                        <p>Stock Out</p>
                        @endif
                        
@@ -58,7 +58,7 @@
                         </div>
                       </div>
                       @php
-                      $stock = $product->inventory->purchage;
+                      $stock = $product->inventory ? $product->inventory->purchage : 0;
                       
                         @endphp
                         @if ($stock <1)
@@ -137,7 +137,7 @@
                             $discount = 0;
                             $discount = $item->discount;
 
-                         $stock = $item->inventory->purchage;
+                         $stock = $item->inventory ? $item->inventory->purchage : 0;
                          $discount_price = $item->price - $item->price * $discount / 100; 
                         
                         @endphp
