@@ -48,7 +48,7 @@ class ProductController extends Controller
         $size = Size::all();
         $category = Category::all();
         $product = Product::latest()->get();
-        return view('admin.product.create', compact('category', 'product','color','size'));
+        return view('admin.product.create', compact('category', 'product', 'color', 'size'));
     }
 
     public function getSubcategory($id)
@@ -76,7 +76,7 @@ class ProductController extends Controller
             'otherImage' => 'max:500',
             'purchage' => 'required|min:1|max:10',
         ]);
-        
+
         $slug = Str::slug($request->name . '-' . time());
         $i = 0;
         while (true) {
@@ -87,10 +87,9 @@ class ProductController extends Controller
             }
             break;
         }
-        try{
+        try {
             // DB::beginTransaction();
             $productCode = $this->generateCode('Product', 'P');
-
             $product = new Product();
             $product->name = $request->name;
             $product->slug = $slug;
@@ -111,7 +110,7 @@ class ProductController extends Controller
             $mainImage = 'p-' . time() . uniqid() . $image->getClientOriginalName();
             $thumbImage = 'thumb-' . time() . uniqid() . $image->getClientOriginalName();
             Image::make($image)->save('uploads/product/' . $mainImage);
-            Image::make($image)->resize(100,75)->save('uploads/product/thumbnail/' . $thumbImage);
+            Image::make($image)->resize(100, 75)->save('uploads/product/thumbnail/' . $thumbImage);
 
             $product->image = $mainImage;
             $product->thum_image = $thumbImage;
@@ -144,12 +143,11 @@ class ProductController extends Controller
                 return back();
             }
 
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Session::flash('error', 'Product can not be added: ' . $e->getMessage());
             return back();
         }
-        
+
     }
 
     /**
@@ -188,7 +186,7 @@ class ProductController extends Controller
         $size = Size::all();
         $category = Category::all();
         $product = Product::with('inventory')->where('slug', $slug)->first();
-        return view('admin.product.edit', compact('product', 'category','color','size'));
+        return view('admin.product.edit', compact('product', 'category', 'color', 'size'));
     }
 
     /**
@@ -212,14 +210,13 @@ class ProductController extends Controller
             // 'code' => 'max:18|unique:products,id',
         ]);
 
-            $product = Product::find($id);
-            $duplicate = Product::where('id', '!=', $id)->where('code', $request->code)->get();
-            if (count($duplicate) > 0) {
+        $product = Product::find($id);
+        $duplicate = Product::where('id', '!=', $id)->where('code', $request->code)->get();
+        if (count($duplicate) > 0) {
             Session::flash('error', ' Product Code duplicate found ');
             return back();
-            }
-            else{
-                $product_image = '';
+        } else {
+            $product_image = '';
             if ($request->hasFile('image')) {
                 $image_path = public_path('uploads/product/' . $product->image);
                 $image_path_thumb = public_path('uploads/product/thumbnail/' . $product->thum_image);
@@ -230,7 +227,7 @@ class ProductController extends Controller
                 $image = $request->file('image');
                 $mainImage = 'p-' . time() . uniqid() . $image->getClientOriginalName();
                 $thumbImage = 'thumb-' . time() . uniqid() . $image->getClientOriginalName();
-    
+
                 Image::make($image)->save('uploads/product/' . $mainImage);
                 Image::make($image)->resize(195, 195)->save('uploads/product/thumbnail/' . $thumbImage);
                 $product_image = $mainImage;
@@ -257,7 +254,7 @@ class ProductController extends Controller
             $product->save_by = Auth::user()->id;
             $product->ip_address = $request->ip();
             $product->save();
-    
+
             // multiple image
             $productImages = $this->imageUpload($request, 'otherImage', 'uploads/otherImage');
             if (is_array($productImages) && count($productImages)) {
@@ -268,25 +265,24 @@ class ProductController extends Controller
                     $imagePath->save();
                 }
             }
-    
+
             if ($request->purchage) {
-                $inventory = Inventory::where('product_id',$product->id)->first();
+                $inventory = Inventory::where('product_id', $product->id)->first();
                 $inventory->purchage = $request->purchage;
                 $inventory->save();
             }
-            if($product){
+            if ($product) {
                 Session::flash('success', 'Product Updated Successfully');
                 return redirect()->route('product.index');
-            }
-            else {
+            } else {
                 Session::flash('error', 'Something went wrong');
                 return redirect()->back();
             }
-        
-            }
 
-            
-        
+        }
+
+
+
     }
     /**
      * Remove the specified resource from storage.
@@ -303,10 +299,10 @@ class ProductController extends Controller
             @unlink($image_path);
             @unlink($image_path_thumb);
         }
-        Inventory::where('product_id',$id)->delete();
+        Inventory::where('product_id', $id)->delete();
         $product->delete();
         Session::flash('success', 'Product deleted successfully');
         return back();
-        
+
     }
 }
