@@ -26,25 +26,28 @@ class HomeController extends Controller
         $banner = Banner::latest()->get();
         $category = Category::with('SubCategory')->orderBy('rank_id', 'ASC')->get();
         $recent = Product::latest()->take(24)->get();
+
         $popular = Product::latest()->where('is_popular', '1')->limit(24)->get();
         $new_arrival = Product::where('is_arrival', '1')->get();
         $home = Product::where('category_id', '8')->inRandomOrder()->limit(12)->get();
         $fullAd = Ad::where('status', 'a')->where('position', '5')->inRandomOrder()->limit(1)->get();
         $partner = Partner::latest()->get();
-        $cartAll = \Cart::getContent();
-        return view('website.index', compact('banner', 'category',  'new_arrival', 'cartAll', 'fullAd', 'popular', 'home', 'recent'));
+        // $cartAll = Cart::getContent();
+
+        return view('website.index', compact('banner', 'category',  'new_arrival', 'fullAd', 'popular', 'home', 'recent'));
     }
 
 
     public function ProductDetails($slug)
     {
-        $product = Product::with('category')->where('slug', $slug)->first();
+        $product = Product::with(['category', 'inventory', 'productImage'])->where('slug', $slug)->first();
         if (isset($product->sub_category_id)) {
             $subCategory_id = $product->sub_category_id;
-            $related = Product::where('sub_category_id', '=', $subCategory_id)->where('id', '!=', $product->id)->get();
+            $related = Product::with('inventory')->where('sub_category_id', '=', $subCategory_id)->where('id', '!=', $product->id)->get();
         } else {
+            
             $category_id = $product->category_id;
-            $related = Product::where('category_id', '=', $product->category->id)->where('id', '!=', $product->id)->limit('12')->get();
+            $related = Product::with('inventory')->where('category_id', '=', $product->category->id)->where('id', '!=', $product->id)->limit('12')->get();
         }
         return view('website.productDetails', compact('product', 'related'));
     }
