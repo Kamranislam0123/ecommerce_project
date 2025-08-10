@@ -53,10 +53,10 @@
                         </div>
                     </a>
                     <div class="ac">
-                        <a class="ic" href="login.html"><i class="fa-solid fa-user" style="font-size: 20px;"></i></a>
+                        <a class="ic" href="{{ route('customer.login') }}"><i class="fa-solid fa-user" style="font-size: 20px;"></i></a>
                         <div class="ac-content">
-                            <a href="login.html">
-                                <h5>Account</h5>
+                            <a href="{{ route('customer.login') }}">
+                                <h4>Account</h4>
                             </a>
                             <p>
                                 <a href="{{ route('customer.signup') }} ">Register</a>
