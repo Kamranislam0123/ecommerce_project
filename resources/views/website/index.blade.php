@@ -322,35 +322,41 @@
                             </form>
                         </div>
                     </div>
+
+@foreach ($recent as $item)
+
                     <div class="p-item item">
                         <div class="p-item-inner">
                             <div class="marks">
-                                <span class="mark">Save: 3000 ৳</span>
+                                <span class="mark">Save: {{ $item->discount > 0 ? $item->discount : 0.00 }} ৳</span>
                             </div>
                             <div class="marks2">
                                 <span class="mark2"> Top</span>
                             </div>
                             <div class="p-item-img">
-                                <a href="epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.html">
-                                    <img alt="Epson EcoTank L6490 A4 All-in-One Ink Tank Printer" height="228"
-                                        src="{{asset('/')}}image/epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.Epson L6490.3.jpg"
+                                <a href="{{ route('product.details', $item->slug) }}">
+                                    <img alt="{{ $item->name }}" height="228"
+                                        src="{{asset($item->thum_image ? 'uploads/product/thumbnail/'.$item->thum_image : 'image/no-image.png')}}"
                                         width="228" />
                                 </a>
                             </div>
                             <div class="p-item-details">
                                 <p class="p-item-name mobile_show_str" style="display: none;">
-                                    <a href="epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.html">
+                                    <a href="{{ route('product.details', $item->slug) }}">
                                         Epson EcoTank L6490...
                                     </a>
+
+                                    
                                 </p>
                                 <p class="p-item-name mobile_hide_str">
                                     <a href="epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.html">
-                                        Epson EcoTank L6490 A4 All-in-One Ink Tank Printer
+                                        {{ $item->name }}
                                     </a>
                                 </p>
                                 <div class="p-item-price">
                                     <span class="price-new">
-                                        46500</span>
+                                        {{ $item->price }}
+                                    </span>
                                     <span class="bd_currency" style="margin-left: 2px;"> ৳</span>
                                     <span class="price-old">
                                         49500
@@ -376,6 +382,8 @@
                             </form>
                         </div>
                     </div>
+
+@endforeach 
                     <div class="p-item item">
                         <div class="p-item-inner">
                             <div class="marks">
