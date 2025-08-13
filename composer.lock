@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ace4148ab1dc864e0456b803d72859c",
+    "content-hash": "1ef182c6cdc2733655ddd8803706f2f8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2023,6 +2023,67 @@
                 }
             ],
             "time": "2024-09-21T08:32:55+00:00"
+        },
+        {
+            "name": "lemonpatwari/bangladeshgeocode",
+            "version": "v3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lemonpatwari/laravel-bangladesh-geocode.git",
+                "reference": "4d92ec8335e1bb0c1ca511a373cfe3fdd672b55e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lemonpatwari/laravel-bangladesh-geocode/zipball/4d92ec8335e1bb0c1ca511a373cfe3fdd672b55e",
+                "reference": "4d92ec8335e1bb0c1ca511a373cfe3fdd672b55e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "lemonpatwari\\bangladeshgeocode\\BangladeshGeocodeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "lemonpatwari\\bangladeshgeocode\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lemon Patwari",
+                    "email": "lemonpatwari@gmail.com",
+                    "homepage": "https://lemonpatwari.com"
+                }
+            ],
+            "description": "A Laravel package for Bangladesh geolocation with divisions, districts, upazilas, and unions.",
+            "homepage": "https://github.com/lemonpatwari/laravel-bangladesh-geocode",
+            "keywords": [
+                "bangladesh",
+                "bangladesh districts",
+                "bangladesh divisions",
+                "bangladesh upazila",
+                "bangladesh-geocode",
+                "geocode",
+                "geolocation",
+                "laravel",
+                "laravel bangladesh address",
+                "lemonpatwari"
+            ],
+            "support": {
+                "issues": "https://github.com/lemonpatwari/laravel-bangladesh-geocode/issues",
+                "source": "https://github.com/lemonpatwari/laravel-bangladesh-geocode/tree/v3.1"
+            },
+            "time": "2025-05-30T06:43:32+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -8279,12 +8340,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.3|^8.0"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
