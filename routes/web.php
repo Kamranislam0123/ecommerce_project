@@ -63,6 +63,10 @@ Route::get('/SubCategory/{slug}', [HomeController::class, 'SubCategoryWise'])->n
 Route::get('/subcategory/list/{slug}',[HomeController::class,'singleSubCategory'])->name('single.subcategory.list');
 Route::get('/allproduct',[HomeController::class,'allProduct'])->name('all.product');
 
+// Offer routes
+Route::get('/offers', [App\Http\Controllers\OfferController::class, 'index'])->name('offers');
+Route::get('/offers/{id}', [App\Http\Controllers\OfferController::class, 'show'])->name('offer.details');
+
 // company profile route
 
 Route::get('/about-us', [HomeController::class, 'aboutWebsite'])->name('about.website');
@@ -382,8 +386,14 @@ Route::group(['middleware' => ['auth','userLoginCheck']] , function(){
             Route::get('/password/change', [UserController::class, 'passwordChange'])->name('password.change');
             Route::post('/password/update', [UserController::class, 'passwordUpdate'])->name('password.update');
 
+            // Offer Management Routes
             Route::get('/offer',[OfferController::class,'index'])->name('customer.offer');
-            Route::post('/offer/update/{offer}',[OfferController::class,'update'])->name('offer.update');
+            Route::get('/offer/create',[OfferController::class,'create'])->name('offer.create');
+            Route::post('/offer/store',[OfferController::class,'store'])->name('offer.store');
+            Route::get('/offer/edit/{id}',[OfferController::class,'edit'])->name('offer.edit');
+            Route::post('/offer/update/{id}',[OfferController::class,'update'])->name('offer.update');
+            Route::delete('/offer/delete/{id}',[OfferController::class,'destroy'])->name('offer.destroy');
+            Route::get('/offer/toggle/{id}',[OfferController::class,'toggleStatus'])->name('offer.toggle');
     });
 
         // subscriber route 
