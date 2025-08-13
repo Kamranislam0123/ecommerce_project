@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <link rel="icon" type="image/png" href="{{ $content->logo }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('website/css/animate.min.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="{{ asset('website/css/animate.min.css') }}"> -->
     <link rel="stylesheet" type="text/css" href="{{ asset('website/css/all.min.css') }}">
     <script src="{{ asset('website/js/jquery.min.js') }}"></script>
     <link href="{{ asset('website/css/material-icons.min.css') }}" rel="stylesheet"/>

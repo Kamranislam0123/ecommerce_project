@@ -1,74 +1,98 @@
 @extends('layouts.website')
+
 @section('website-content')
 
-    <section class="py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="text-center text-success text-uppercase"> Customer Login</h3>
-                        </div>
+{{-- 
+  This Blade directive is a cleaner way to run simple PHP logic inside a view.
+  It clears any 'phone' value from the session when the login page loads.
+--}}
+@php
+    Session::forget('phone');
+@endphp
 
-                        <div class="card-body p-3">
-                            <form action="{{ route('customer.auth') }}" method="post">
-                                @csrf
-                                <div class="form-group pt-3">
-                                    <label class="form-label" for="userphone">Phone</label>
-                                    <input type="text" name="userphone" id="userphone" class="form-control px-3" placeholder="Phone Number">
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-12">
+                <div class="card">
+                    <div class="">
+                        <h3 class="text-center text-success text-uppercase">Customer Login</h3>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form action="{{ route('customer.auth') }}" method="post">
+                            @csrf
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="userphone">Phone</label>
+                                <input type="text" name="userphone" id="userphone"
+                                    class="form-control @error('userphone') is-invalid @enderror"
+                                    placeholder="Enter your phone number" value="{{ old('userphone') }}">
+                                @error('userphone')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-3 position-relative">
+                                <label class="form-label" for="id_password">Password</label>
+                                <input type="password" name="password" id="id_password"
+                                    class="form-control @error('password') is-invalid @enderror"
+                                    placeholder="Enter your password">
+                                
+                                <!-- <i class="far fa-eye" id="togglePassword" 
+                                   style="position: absolute; right: 15px; top: 72%; transform: translateY(-50%); cursor: pointer;"></i> -->
+                                
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="form-group py-2">
+                                <button type="submit" class="btn btn-success w-100 mx-auto d-block">Login</button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="forget-password">
+                                    <a href="{{ route('forget.password') }}" class="text-danger">Forget Password?</a>
                                 </div>
-                                <div class="form-group py-3 position-relative">
-                                    <label class="form-label" for="id_password">Password</label>
-                                    <input type="password" name="password" id="id_password" class="form-control px-3 "
-                                        placeholder="Password"><i class="far fa-eye show-icon position-absolute"
-                                        id="togglePassword" style="margin-left: -30px; cursor: pointer;"></i>
+
+                                <div class="text-center">
+                                    <a class="fs-9 fw-bold" href="{{ route('customer.signup') }}">Create an account</a>
                                 </div>
-                                <div class="form-group py-3">
-                                    {{-- <div class="">
-                                        <span>
-                                            <a href="{{ route('customer.signup') }}" class="btn btn-success ms-auto"> Sign Up</a>
-                                        </span>
-
-                                    </div> --}}
-                                    <div class="ms-auto">
-                                        <span class="">
-                                            <button type="submit" class="btn btn-success ms-0 w-100">Login</button>
-                                        </span>
-
-
-                                        <div class="forget-password mt-2">
-                                            <a href="{{ route('forget.password') }}" class="text-danger">Forget
-                                                Password</a>
-                                        </div>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="fs-9 fw-bold" href="{{ route('customer.signup') }}">Create an account</a>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
             </div>
         </div>
-    </section>
-    <?php
-    Session::forget('phone');
-    ?>
-@endsection
-@push('website-js')
-    <script>
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#id_password');
+    </div>
+</section>
 
-        togglePassword.addEventListener('click', function(e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            // toggle the eye slash icon
+{{-- 
+  FIXED: The duplicate script was removed. 
+  All page-specific scripts should be in a single @push block within the @section.
+--}}
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('id_password');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the input type between 'password' and 'text'
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            // Toggle the icon class between 'fa-eye' and 'fa-eye-slash' for visual feedback
+            this.classList.toggle('fa-eye');
             this.classList.toggle('fa-eye-slash');
         });
-    </script>
-
+    });
+</script>
 @endpush
+
+@endsection

@@ -42,8 +42,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="ht-item q-actions">
-                    <a class="ac h-offer-icon" href="16.html">
+                <div class="ht-item q-actions" >
+                    <a class="ac h-offer-icon" href="{{ route('offers') }}">
                         <div class="ic">
                             <img alt="Offers" src="{{asset('/')}}image/offer.gif" style="width: 35px; height: 30px;" />
                         </div>
