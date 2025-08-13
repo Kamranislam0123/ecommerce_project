@@ -17,7 +17,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
 	        PagesSeeder::class,
 	        PermissionSeeder::class,
-	       
+	        ProductSeeder::class,
+	        CountrySeeder::class,
+	        DivisionSeeder::class,
+	        DistrictSeeder::class,
+	        ThanaSeeder::class,
     	]);
     }
 }
