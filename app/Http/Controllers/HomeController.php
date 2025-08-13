@@ -32,23 +32,85 @@ class HomeController extends Controller
         $home = Product::where('category_id', '8')->inRandomOrder()->limit(12)->get();
         $fullAd = Ad::where('status', 'a')->where('position', '5')->inRandomOrder()->limit(1)->get();
         $partner = Partner::latest()->get();
+        
+        // Get categories with their products for dynamic sections
+        $categorySections = Category::with(['product' => function($query) {
+            $query->inRandomOrder()->limit(8);
+        }])->whereHas('product')->take(3)->get();
+        
         // $cartAll = Cart::getContent();
 
-        return view('website.index', compact('banner', 'category',  'new_arrival', 'fullAd', 'popular', 'home', 'recent'));
+        return view('website.index', compact('banner', 'category',  'new_arrival', 'fullAd', 'popular', 'home', 'recent', 'categorySections'));
     }
 
 
     public function ProductDetails($slug)
     {
-        $product = Product::with(['category', 'inventory', 'productImage'])->where('slug', $slug)->first();
-        if (isset($product->sub_category_id)) {
-            $subCategory_id = $product->sub_category_id;
-            $related = Product::with('inventory')->where('sub_category_id', '=', $subCategory_id)->where('id', '!=', $product->id)->get();
-        } else {
-            
-            $category_id = $product->category_id;
-            $related = Product::with('inventory')->where('category_id', '=', $product->category->id)->where('id', '!=', $product->id)->limit('12')->get();
+        // First try to find the product normally
+        $product = Product::with(['category', 'inventory', 'productImage'])
+            ->where('slug', $slug)
+            ->first();
+        
+        // If not found, check if it's soft deleted
+        if (!$product) {
+            $product = Product::withTrashed()
+                ->with(['category', 'inventory', 'productImage'])
+                ->where('slug', $slug)
+                ->first();
         }
+        
+        // Check if product exists
+        if (!$product) {
+            abort(404, 'Product not found');
+        }
+        
+        // Check if product is soft deleted
+        if ($product->trashed()) {
+            abort(404, 'Product has been deleted');
+        }
+        
+        // Get related products - improved logic
+        $related = collect();
+        
+        // First, try to get products from the same subcategory
+        if ($product->sub_category_id) {
+            $subCategoryRelated = Product::with('inventory')
+                ->where('sub_category_id', $product->sub_category_id)
+                ->where('id', '!=', $product->id)
+                ->where('status', 'A')
+                ->inRandomOrder()
+                ->limit(6)
+                ->get();
+            $related = $related->merge($subCategoryRelated);
+        }
+        
+        // If we don't have enough related products, add products from the same category
+        if ($related->count() < 6) {
+            $categoryRelated = Product::with('inventory')
+                ->where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id)
+                ->where('status', 'A')
+                ->inRandomOrder()
+                ->limit(6 - $related->count())
+                ->get();
+            $related = $related->merge($categoryRelated);
+        }
+        
+        // If still not enough, add some popular products
+        if ($related->count() < 6) {
+            $popularRelated = Product::with('inventory')
+                ->where('is_popular', 1)
+                ->where('id', '!=', $product->id)
+                ->where('status', 'A')
+                ->inRandomOrder()
+                ->limit(6 - $related->count())
+                ->get();
+            $related = $related->merge($popularRelated);
+        }
+        
+        // Remove duplicates and limit to 6
+        $related = $related->unique('id')->take(6);
+        
         return view('website.productDetails', compact('product', 'related'));
     }
 
@@ -200,11 +262,15 @@ class HomeController extends Controller
         }
     }
 
-    public function thanaChange(Request $request)
-    {
-        $thana = Thana::where('district_id', $request->district_id)->get();
-        return response()->json($thana);
-    }
+public function thanaChange(Request $request)
+{
+    // Fetch Thana based on district_id
+    $thanas = Thana::where('district_id', $request->district_id)->get();
+
+    // Return as JSON response
+    return response()->json($thanas);
+}
+
 
     public function areaChange(Request $request)
     {
