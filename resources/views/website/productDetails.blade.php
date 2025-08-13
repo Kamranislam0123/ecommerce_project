@@ -1,15 +1,153 @@
 @extends('layouts.website')
 @section('website-content')
 
+<style>
+    .question-wrap {
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+        margin-bottom: 15px;
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .question-author {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .question-date {
+        color: #666;
+        font-size: 0.9em;
+        margin-left: 10px;
+    }
+    
+    .question-content {
+        margin-bottom: 10px;
+    }
+    
+    .answer-content {
+        background-color: #f8f9fa;
+        border-left: 3px solid #007bff;
+        padding: 15px;
+        margin-left: 20px;
+        border-radius: 0 5px 5px 0;
+    }
+    
+    .review-wrap {
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+        margin-bottom: 15px;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .review-author {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .review-date {
+        color: #666;
+        font-size: 0.9em;
+        margin-left: 10px;
+    }
+    
+    .review-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .stars {
+        color: #ffc107;
+    }
+    
+    .rating-text {
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .review-content h5 {
+        margin-bottom: 10px;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .review-content p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .average-rating {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    
+    .section-head {
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .title-n-action h2 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .section-blurb {
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    /* Product Gallery Thumbnail Styles */
+    .product_gallery {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .product_gallery:hover {
+        border-color: #007bff;
+        transform: scale(1.05);
+    }
+    
+    .product_gallery.active {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    }
+    
+    .product_gallery img {
+        transition: transform 0.3s ease;
+    }
+    
+    .product_gallery:hover img {
+        transform: scale(1.1);
+    }
+</style>
+
 <!-- Debug: Print Product Data -->
-<div style="background: #f5f5f5; padding: 20px; margin: 20px; border: 1px solid #ddd; border-radius: 5px;">
+<!-- <div style="background: #f5f5f5; padding: 20px; margin: 20px; border: 1px solid #ddd; border-radius: 5px;">
     <h3>Product Data Debug:</h3>
     <pre style="background: white; padding: 10px; border-radius: 3px; overflow-x: auto;">
         @php
             print_r($product);
         @endphp
     </pre>
-</div>
+</div> -->
 
         
     <section class="details my-3">
@@ -18,7 +156,7 @@
                 <div class="share-on">
                     <span class="share">Share:&nbsp;</span>
                     <img id="imageProductShare"
-                        src="https://corporatetechbd.com/images/productimage/epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.Epson L6490.3.jpg"
+                        src="{{ asset('uploads/product/' . $product->image) }}"
                         style="display:none;">
                     <svg class="svg-inline--fa fa-facebook icon-sprite share-ico" onclick="Facebook(15)"
                         aria-labelledby="svg-inline--fa-title-mUmXtKrHNQVg" data-prefix="fab" data-icon="facebook"
@@ -66,194 +204,90 @@
             </div>
             <div class="basic row">
                 <div class="col-md-5">
-
                     <div class="images product-images">
                         <div class="product-img-holder">
-                            <a class="thumbnail" href="#" title="Epson EcoTank L6490 A4 All-in-One Ink Tank Printer">
+                            <a class="thumbnail" href="#" title="{{ $product->name }}">
                                 <img id="product-zoom" class="main-img responsive_mobile_image"
-                                    src="https://corporatetechbd.com/public/images/productimage/epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.Epson L6490.3.jpg"
-                                    title="Epson EcoTank L6490 A4 All-in-One Ink Tank Printer"
-                                    alt="Epson EcoTank L6490 A4 All-in-One Ink Tank Printer" width="500" height="500"
-                                    data-zoom-image="https://corporatetechbd.com/public/images/productimage/epson-ecotank-l6490-a4-all-in-one-ink-tank-printer.Epson L6490.3.jpg">
+                                    src="{{ asset('uploads/product/' . $product->image) }}"
+                                    title="{{ $product->name }}"
+                                    alt="{{ $product->name }}" width="500" height="500"
+                                    data-zoom-image="{{ asset('uploads/product/' . $product->image) }}">
                             </a>
-                            <meta itemprop="image" content="image">
+                            <meta itemprop="image" content="{{ asset('uploads/product/' . $product->image) }}">
                         </div>
 
 
-                        <div id="owl-demo" class="owl-carousel owl-theme owl-loaded owl-drag">
-
-
-
-
-                            <div class="owl-stage-outer">
-                                <div class="owl-stage"
-                                    style="transform: translate3d(-564px, 0px, 0px); transition: 2s linear; width: 1316px;">
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
+                        <div id="owl-demo" class="owl-carousel owl-theme">
+                            @if($product->productImage && $product->productImage->count() > 0)
+                                @foreach($product->productImage as $image)
+                                    @php
+                                        // Handle both full paths and just filenames
+                                        $imagePath = $image->otherImage;
+                                        if (strpos($imagePath, 'uploads/') === 0) {
+                                            // Full path already included
+                                            $imageUrl = asset($imagePath);
+                                        } else {
+                                            // Just filename, add the directory
+                                            $imageUrl = asset('uploads/productdetails/' . $imagePath);
+                                        }
+                                    @endphp
+                                    <div class="item">
+                                        <div class="thumbnail product_gallery" href="javascript:void(0);"
+                                            onclick="changeProductImage(this)"
+                                            data-image="{{ $imageUrl }}"
+                                            data-zoom-image="{{ $imageUrl }}">
+                                            <img src="{{ $imageUrl }}"
+                                                title="{{ $product->name }}" 
+                                                style="width: 100px; height: 100px; object-fit: contain; border-radius: 5px;">
                                         </div>
                                     </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item active" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item active" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item active" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned active" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned active" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607673608.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607667729.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607650363.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="owl-item cloned" style="width: 84px; margin-right: 10px;">
-                                        <div class="item">
-                                            <div class="thumbnail product_gallery" href="javascript:void(0);"
-                                                onclick="changeProductImage(this)"
-                                                data-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                data-zoom-image="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg">
-                                                <img src="https://corporatetechbd.com/public/images/productdetails/15_172758607670837.jpg"
-                                                    title="" width="100px" height="150px">
-                                            </div>
-                                        </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback: Show main product image -->
+                                <div class="item">
+                                    <div class="thumbnail product_gallery" href="javascript:void(0);"
+                                        onclick="changeProductImage(this)"
+                                        data-image="{{ asset('uploads/product/' . $product->image) }}"
+                                        data-zoom-image="{{ asset('uploads/product/' . $product->image) }}">
+                                        <img src="{{ asset('uploads/product/' . $product->image) }}"
+                                            title="{{ $product->name }}" 
+                                            style="width: 100px; height: 100px; object-fit: contain;">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="owl-nav disabled"><button type="button" role="presentation" class="owl-prev"><span
-                                        aria-label="Previous">‹</span></button><button type="button" role="presentation"
-                                    class="owl-next"><span aria-label="Next">›</span></button></div>
-                            <div class="owl-dots disabled"><button role="button"
-                                    class="owl-dot active"><span></span></button></div>
+                                <!-- Debug: Show if no images found -->
+                                @if(config('app.debug'))
+                                    <div class="item">
+                                        <div class="thumbnail product_gallery">
+                                            <p style="color: #999; font-size: 12px; text-align: center; padding: 10px;">
+                                                No additional images found<br>
+                                                Product ID: {{ $product->id }}<br>
+                                                Product Images Count: {{ $product->productImage ? $product->productImage->count() : 0 }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
-
-
-                       
                     </div>
+
+                    <!-- Debug: Product Image Information -->
+                    <!-- @if(config('app.debug'))
+                        <div style="background: #f5f5f5; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;">
+                            <strong>Debug Info:</strong><br>
+                            Product ID: {{ $product->id }}<br>
+                            Product Name: {{ $product->name }}<br>
+                            Product Images Count: {{ $product->productImage ? $product->productImage->count() : 0 }}<br>
+                            @if($product->productImage && $product->productImage->count() > 0)
+                                <strong>Product Images:</strong><br>
+                                @foreach($product->productImage as $index => $image)
+                                    {{ $index + 1 }}. {{ $image->otherImage }}<br>
+                                @endforeach
+                            @else
+                                <strong>No product images found in database</strong><br>
+                                <small>You can add images to the product_images table with product_id = {{ $product->id }}</small>
+                            @endif
+                        </div>
+                    @endif -->
 
                     <!-- disclimer -->
                     <div class="disclaimer-slider owl-carousel desclaimer_css owl-loaded owl-drag">
@@ -437,129 +471,7 @@
                         </form>
                     </div>
 
-                    <div class="row mt-4">
-                        <h3 class="text-center pb-4" style="color: #3749bb;">Combo Product</h3>
 
-
-                        <div class="col-md-4 col-12">
-                            <div class="product-item">
-                                <div class="">
-                                    <a
-                                        href="https://corporatetechbd.com/product/epson-ecotank-l130-single-function-inktank-printer">
-                                        <img src="https://corporatetechbd.com/public/images/productimage/epson-ecotank-l130-single-function-inktank-printer.l130printer.jpg"
-                                            alt="Epson EcoTank L130 Single Function InkTank Printer" style="height: 210px;">
-                                    </a>
-                                    <div>
-                                        <br>
-                                        <h4 class="p-item-name" style="height: 40px;">
-                                            <a
-                                                href="https://corporatetechbd.com/product/epson-ecotank-l130-single-function-inktank-printer">
-                                                Epson EcoTank L130 Single Function InkTank Printer
-                                            </a>
-                                        </h4>
-                                        <div class="p-item-price">
-
-                                            <span>14500</span>
-                                            <span class="bd_currency">৳</span>
-
-
-                                        </div>
-                                        <div class="actions">
-                                            <a href="#" product-id="6" qty="1" product_name="Epson EcoTank L6490..."
-                                                product_price="14500" max_order_qty="10"
-                                                class="btn btn-outline-primary add_to_cart_single_qty"
-                                                style="width: 50%; margin:  10px 0px 0px 0px; border: none;">
-                                                Add to Cart
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-md-4 col-12">
-                            <div class="product-item">
-                                <div class="">
-                                    <a
-                                        href="https://corporatetechbd.com/product/epson-ecotank-l3210-multifunction-inktank-printer">
-                                        <img src="https://corporatetechbd.com/public/images/productimage/epson-ecotank-l3210-multifunction-inktank-printer.Epson L3210.jpg"
-                                            alt="Epson EcoTank L3210 Multifunction InkTank Printer" style="height: 210px;">
-                                    </a>
-                                    <div>
-                                        <br>
-                                        <h4 class="p-item-name" style="height: 40px;">
-                                            <a
-                                                href="https://corporatetechbd.com/product/epson-ecotank-l3210-multifunction-inktank-printer">
-                                                Epson EcoTank L3210 Multifunction InkTank Printer
-                                            </a>
-                                        </h4>
-                                        <div class="p-item-price">
-
-                                            <span>18500</span>
-                                            <span class="bd_currency">৳</span>
-
-                                            <span class="price-old">
-
-                                                19000
-                                            </span>
-
-                                        </div>
-                                        <div class="actions">
-                                            <a href="#" product-id="7" qty="1" product_name="Epson EcoTank L6490..."
-                                                product_price="18500" max_order_qty="5"
-                                                class="btn btn-outline-primary add_to_cart_single_qty"
-                                                style="width: 50%; margin:  10px 0px 0px 0px; border: none;">
-                                                Add to Cart
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-md-4 col-12">
-                            <div class="product-item">
-                                <div class="">
-                                    <a
-                                        href="https://corporatetechbd.com/product/epson-ecotank-l3250-a4-wi-fi-multifunction-inktank-printer">
-                                        <img src="https://corporatetechbd.com/public/images/productimage/epson-ecotank-l3250-a4-wi-fi-multifunction-inktank-printer.Epson L3250.jpg"
-                                            alt="Epson EcoTank L3250 A4 Wi-Fi Multifunction InkTank Printer"
-                                            style="height: 210px;">
-                                    </a>
-                                    <div>
-                                        <br>
-                                        <h4 class="p-item-name" style="height: 40px;">
-                                            <a
-                                                href="https://corporatetechbd.com/product/epson-ecotank-l3250-a4-wi-fi-multifunction-inktank-printer">
-                                                Epson EcoTank L3250 A4 Wi-Fi Multifunction InkTank Printer
-                                            </a>
-                                        </h4>
-                                        <div class="p-item-price">
-
-                                            <span>20500</span>
-                                            <span class="bd_currency">৳</span>
-
-                                            <span class="price-old">
-
-                                                22000
-                                            </span>
-
-                                        </div>
-                                        <div class="actions">
-                                            <a href="#" product-id="8" qty="1" product_name="Epson EcoTank L6490..."
-                                                product_price="20500" max_order_qty="10"
-                                                class="btn btn-outline-primary add_to_cart_single_qty"
-                                                style="width: 50%; margin:  10px 0px 0px 0px; border: none;">
-                                                Add to Cart
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -709,125 +621,14 @@
             <div class="row">
                 <div class="col-lg-9 col-md-12">
                     <div class="navs description-nav">
-                        <ul class="nav has-child c-1">
-                            <li data-area="specification" id="specification_area">Specification</li>
+                        <ul class="nav has-child c-1 mb-2">
+                           
                             <li data-area="description" id="description_area">Description</li>
                             <li class="hidden-xs" data-area="ask-question" id="question_area">Questions </li>
                             <li data-area="write-review" id="review_area">Reviews</li>
                         </ul>
                     </div>
 
-                    <section class="specification-tab m-tb-10" id="specification">
-                        <div class="section-head">
-                            <h2 class="title-n-action"> Specification</h2>
-                        </div>
-                        <p><span style="color:#2980b9">General Specifications:</span></p>
-
-                        <ul>
-                            <li>Functions: Print, Scan, Copy, Fax with ADF</li>
-                            <li>Output Color: Black / Color</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Print Specifications:</span></p>
-
-                        <ul>
-                            <li>Technology: On-demand inkjet (PrecisionCore Printhead)</li>
-                            <li>Print Speed: Up to 37 ppm (black), 23 ppm (color); Approx. 69 sec per photo (Border), 90 sec
-                                per photo (Borderless)</li>
-                            <li>Print Resolution: 4800 x 1200 dpi</li>
-                            <li>First Print Out Time: 7.0 sec (Black), 11.0 sec (Color)</li>
-                            <li>Duplex Printing: Automatic</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Copy Specifications:</span></p>
-
-                        <ul>
-                            <li>Copy Speed: 12.0 ipm (Black), 6.0 ipm (Color) for flatbed; 10.0 ipm (Black), 4.5 ipm (Color)
-                                for ADF</li>
-                            <li>Copy Resolution: 600 x 600 dpi</li>
-                            <li>Reduction / Enlargement: 25 - 400%</li>
-                            <li>Maximum Copy Size: Legal</li>
-                            <li>Max Copies: 99</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Scan Specifications:</span></p>
-
-                        <ul>
-                            <li>Scan Type: Flatbed color image scanner</li>
-                            <li>Scan Resolution: 1200 x 2400 dpi</li>
-                            <li>Scan Speed:</li>
-                            <li>A4 Black: 6.0 ipm with ADF scan at 200 dpi, 12 sec with flatbed scan at 200 dpi</li>
-                            <li>A4 Color: 5.0 ipm with ADF scan at 200 dpi, 27 sec with flatbed scan at 200 dpi</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Fax Specifications:</span></p>
-
-                        <ul>
-                            <li>Transmission Speed: 33.6 Kbps</li>
-                            <li>Max Resolution: 200 x 200 dpi</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Paper Handling:</span></p>
-
-                        <ul>
-                            <li>Paper Sizes: Legal, Indian Legal (215 x 345 mm), Letter, A4, 16K (195 x 270 mm), B5, A5, B6,
-                                A6, Hagaki (100 x 148 mm)</li>
-                            <li>Paper Types: Plain Paper, Premium Glossy Photo Paper, Envelope, Postcard</li>
-                            <li>Paper Weight: 64 - 95 g/m²</li>
-                            <li>Input Capacity: 250 Sheets (Cassette 1), 1 Sheet (Rear Slot)</li>
-                            <li>Output Capacity: 30 Sheets</li>
-                            <li>ADF Capacity: 35 Sheets</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Technical Specifications:</span></p>
-
-                        <ul>
-                            <li>Display: 2.4 Inch Color LCD Touch Screen</li>
-                            <li>Connectivity: Wi-Fi, USB 2.0, Ethernet, Wi-Fi Direct</li>
-                            <li>Power Consumption: AC 220 - 240 V, 50 - 60 Hz, 12 W (Operating), 0.9 W (Standby), 0.2 W
-                                (Power Off)</li>
-                            <li>Dimensions: 375 x 347 x 346 mm</li>
-                            <li>Weight: 7.3 kg</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Ink Bottles:</span></p>
-
-                        <ul>
-                            <li>Black: Epson 003 Black (Page Yield: 7,500 Pages)</li>
-                            <li>Color: Epson 003 Cyan, Magenta, Yellow (Page Yield: 6,000 Pages each)</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Software Compatibility:</span></p>
-
-                        <ul>
-                            <li>Supported Operating Systems: Windows 7, 8, 8.1, 10, Vista, XP, Server 2003, 2008, 2012,
-                                2016; Mac OS X 10.6.8 or later</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Special Features:</span></p>
-
-                        <ul>
-                            <li>Mobile Printing: Apple AirPrint, Google Cloud Print, Mopria Print Service</li>
-                            <li>Web Printing: Epson iPrint, Epson Email Print, Remote Print Driver</li>
-                        </ul>
-
-                        <hr>
-                        <p><span style="color:#2980b9">Warranty Information:</span></p>
-
-                        <ul>
-                            <li>Warranty: 1-year free after-sale service warranty. Note: The adapter/power cable has no
-                                warranty; the box is mandatory for warranty claims.</li>
-                        </ul>
-                    </section>
 
                     <section class="description bg-white m-tb-15" id="description">
                         <div class="section-head">
@@ -839,10 +640,10 @@
                     </section>
 
 
-                    <section class="ask-question q-n-r-section bg-white m-tb-15" id="question">
+                    <section class="ask-question q-n-r-section bg-white m-tb-15" id="question_area">
                         <div class="section-head">
                             <div class="title-n-action">
-                                <h2>Questions (0)</h2>
+                                <h2>Questions (4)</h2>
                                 <p class="section-blurb">Have question about this product? Get specific details about
                                     this product from expert.</p>
                             </div>
@@ -900,19 +701,91 @@
 
                         <div id="question">
 
-                            <div class="empty-content">
-                                <span class="icon material-icons"></span>
-                                <div class="empty-text"></div>
+                            <div class="question-wrap">
+                                <div class="question-header">
+                                    <div class="question-author">
+                                        <strong>John D.</strong>
+                                        <span class="question-date">2 days ago</span>
+                                    </div>
+                                </div>
+                                <div class="question-content">
+                                    <p><strong>Q:</strong> Does this product come with a warranty? What's the coverage period?</p>
+                                </div>
+                                <div class="answer-content" style="margin-left: 20px; margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #007bff;">
+                                    <p><strong>A:</strong> Yes, this product comes with a 1-year manufacturer warranty covering defects in materials and workmanship. Extended warranty options are also available.</p>
+                                    <small class="text-muted">- Customer Support Team</small>
+                                </div>
+                            </div>
+
+                            <div class="question-wrap">
+                                <div class="question-header">
+                                    <div class="question-author">
+                                        <strong>Sarah M.</strong>
+                                        <span class="question-date">1 week ago</span>
+                                    </div>
+                                </div>
+                                <div class="question-content">
+                                    <p><strong>Q:</strong> Is this compatible with Windows 11? I'm planning to upgrade my system.</p>
+                                </div>
+                                <div class="answer-content" style="margin-left: 20px; margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #007bff;">
+                                    <p><strong>A:</strong> Yes, this product is fully compatible with Windows 11. All drivers and software are updated to support the latest Windows version.</p>
+                                    <small class="text-muted">- Technical Support</small>
+                                </div>
+                            </div>
+
+                            <div class="question-wrap">
+                                <div class="question-header">
+                                    <div class="question-author">
+                                        <strong>Mike R.</strong>
+                                        <span class="question-date">2 weeks ago</span>
+                                    </div>
+                                </div>
+                                <div class="question-content">
+                                    <p><strong>Q:</strong> What's included in the package? Does it come with all necessary cables?</p>
+                                </div>
+                                <div class="answer-content" style="margin-left: 20px; margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #007bff;">
+                                    <p><strong>A:</strong> The package includes the main product, power cable, USB cable, installation CD, and user manual. All necessary cables for basic operation are included.</p>
+                                    <small class="text-muted">- Product Team</small>
+                                </div>
+                            </div>
+
+                            <div class="question-wrap">
+                                <div class="question-header">
+                                    <div class="question-author">
+                                        <strong>Lisa K.</strong>
+                                        <span class="question-date">3 weeks ago</span>
+                                    </div>
+                                </div>
+                                <div class="question-content">
+                                    <p><strong>Q:</strong> Can I use this for professional work? I need it for my small business.</p>
+                                </div>
+                                <div class="answer-content" style="margin-left: 20px; margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-left: 3px solid #007bff;">
+                                    <p><strong>A:</strong> Absolutely! This product is designed for both personal and professional use. Many small businesses use it successfully for their daily operations.</p>
+                                    <small class="text-muted">- Business Solutions Team</small>
+                                </div>
                             </div>
                         </div>
                     </section>
-                    <section class="review  q-n-r-section bg-white m-tb-15" id="review">
+                    <section class="review  q-n-r-section bg-white m-tb-15" id="review_area">
                         <div class="section-head">
                             <div class="title-n-action">
-                                <h2>Reviews (0)</h2>
+                                <h2>Reviews (5)</h2>
                                 <p class="section-blurb">Get specific details about this product from customers who own
                                     it.</p>
-                                <div class="average-rating"></div>
+                                <div class="average-rating">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                        <div class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="far fa-star text-warning"></i>
+                                        </div>
+                                        <span style="font-size: 18px; font-weight: bold;">4.6</span>
+                                        <span style="color: #666;">out of 5</span>
+                                        <span style="color: #666;">(5 reviews)</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="q-action">
                                 To write a review,
@@ -925,6 +798,121 @@
 
                         <div id="review">
 
+                            <div class="review-wrap" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <strong>David Wilson</strong>
+                                        <span class="review-date">1 day ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </span>
+                                        <span class="rating-text">5.0</span>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <h5>Excellent product, highly recommended!</h5>
+                                    <p>I've been using this product for about a month now and I'm extremely satisfied. The quality is outstanding and it performs exactly as advertised. The setup was straightforward and the customer service was helpful when I had questions. Definitely worth the investment!</p>
+                                </div>
+                            </div>
+
+                            <div class="review-wrap" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <strong>Emily Johnson</strong>
+                                        <span class="review-date">3 days ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="far fa-star text-warning"></i>
+                                        </span>
+                                        <span class="rating-text">4.0</span>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <h5>Great value for money</h5>
+                                    <p>This product offers excellent value for the price. The features are impressive and it works well for my needs. The only minor issue is that the instructions could be a bit clearer, but once you get the hang of it, it's smooth sailing. Would definitely recommend!</p>
+                                </div>
+                            </div>
+
+                            <div class="review-wrap" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <strong>Robert Chen</strong>
+                                        <span class="review-date">1 week ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </span>
+                                        <span class="rating-text">5.0</span>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <h5>Perfect for professional use</h5>
+                                    <p>I use this in my small business and it's been a game-changer. The reliability is outstanding and it handles heavy daily use without any issues. The build quality is solid and it looks professional. Highly recommend for business users!</p>
+                                </div>
+                            </div>
+
+                            <div class="review-wrap" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <strong>Maria Garcia</strong>
+                                        <span class="review-date">2 weeks ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="far fa-star text-warning"></i>
+                                        </span>
+                                        <span class="rating-text">4.0</span>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <h5>Good product with minor improvements needed</h5>
+                                    <p>Overall, this is a solid product that does what it's supposed to do. The performance is good and the quality is decent. My only suggestion would be to improve the user interface slightly, but it's not a deal-breaker. Good value for the price.</p>
+                                </div>
+                            </div>
+
+                            <div class="review-wrap" style="border-bottom: 1px solid #eee; padding: 20px 0;">
+                                <div class="review-header">
+                                    <div class="review-author">
+                                        <strong>James Thompson</strong>
+                                        <span class="review-date">3 weeks ago</span>
+                                    </div>
+                                    <div class="review-rating">
+                                        <span class="stars">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </span>
+                                        <span class="rating-text">5.0</span>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <h5>Exceeded my expectations</h5>
+                                    <p>I was a bit skeptical at first, but this product has completely exceeded my expectations. The performance is outstanding, the design is sleek, and it's very user-friendly. The customer support team was also very helpful during setup. Highly recommend!</p>
+                                </div>
+                            </div>
+
                         </div>
                     </section>
 
@@ -933,68 +921,42 @@
                 <div class="col-lg-3 col-md-12 c-left" style="margin-top: 54px;">
                     <section class="related-product-list">
                         <h3>Related Product</h3>
-                        <div class="p-s-item m-t-30">
-                            <div class="image-holder">
-                                <a
-                                    href="https://corporatetechbd.com/product/splashjet-premium-008-compatible-refill-ink-for-epson">
-                                    <img src="https://corporatetechbd.com/public/images/productimage/splashjet-premium-008-compatible-refill-ink-for-epson.61GVM1-peuL._SX679_.jpg"
-                                        alt="Splashjet Premium 008 Compatible Refill Ink for Epson L6460-L15150 Printer"
-                                        width="80" height="80">
-                                </a>
-                            </div>
-                            <div class="caption">
-                                <h4 class="p-item-name mobile_show_str" style="display: none;">
-                                    <a
-                                        href="https://corporatetechbd.com/product/splashjet-premium-008-compatible-refill-ink-for-epson">
-                                        Splashjet Premium 008 Compatible Refill Ink for Epson L6460-L15150 Pri...
-                                    </a>
-                                </h4>
-                                <h4 class="p-item-name mobile_hide_str">
-                                    <a
-                                        href="https://corporatetechbd.com/product/splashjet-premium-008-compatible-refill-ink-for-epson">
-                                        Splashjet Premium 008 Compatible Re...
-                                    </a>
-                                </h4>
-                                <div class="p-item-price price">
-                                    <span class="bd_currency">৳</span>
-                                    <span>3000</span>
+                        @if($related && $related->count() > 0)
+                            @foreach($related->take(6) as $relatedProduct)
+                                <div class="p-s-item m-t-30">
+                                    <div class="image-holder">
+                                        <a href="{{ route('product.details', $relatedProduct->slug) }}">
+                                            <img src="{{ asset('uploads/product/' . $relatedProduct->image) }}"
+                                                alt="{{ $relatedProduct->name }}"
+                                                width="80" height="80">
+                                        </a>
+                                    </div>
+                                    <div class="caption">
+                                        <h4 class="p-item-name mobile_show_str" style="display: none;">
+                                            <a href="{{ route('product.details', $relatedProduct->slug) }}">
+                                                {{ $relatedProduct->name }}
+                                            </a>
+                                        </h4>
+                                        <h4 class="p-item-name mobile_hide_str">
+                                            <a href="{{ route('product.details', $relatedProduct->slug) }}">
+                                                {{ Str::limit($relatedProduct->name, 30) }}
+                                            </a>
+                                        </h4>
+                                        <div class="p-item-price price">
+                                            <span class="bd_currency">৳</span>
+                                            <span>{{ number_format($relatedProduct->price) }}</span>
+                                        </div>
+                                        <div class="actions">
+                                            <span class="btn-compare" onclick=""><i class="material-icons"></i></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="actions">
-                                    <span class="btn-compare" onclick=""><i class="material-icons"></i></span>
-                                </div>
+                            @endforeach
+                        @else
+                            <div class="p-s-item m-t-30">
+                                <p class="text-center text-muted">No related products found.</p>
                             </div>
-                        </div>
-                        <div class="p-s-item m-t-30">
-                            <div class="image-holder">
-                                <a
-                                    href="https://corporatetechbd.com/product/epson-008-compatible-refill-pigment-ink-for-epson-l6460-l15150-printer">
-                                    <img src="https://corporatetechbd.com/public/images/productimage/epson-008-compatible-refill-pigment-ink-for-epson-l6460-l15150-printer.008.jpeg"
-                                        alt="Epson 008 Compatible Refill Pigment Ink for Epson L6460-L15150 Printer"
-                                        width="80" height="80">
-                                </a>
-                            </div>
-                            <div class="caption">
-                                <h4 class="p-item-name mobile_show_str" style="display: none;">
-                                    <a
-                                        href="https://corporatetechbd.com/product/epson-008-compatible-refill-pigment-ink-for-epson-l6460-l15150-printer">
-                                        Epson 008 Compatible Refill Pigment Ink for Epson L6460-L15150 Printer
-                                    </a>
-                                </h4>
-                                <h4 class="p-item-name mobile_hide_str">
-                                    <a
-                                        href="https://corporatetechbd.com/product/epson-008-compatible-refill-pigment-ink-for-epson-l6460-l15150-printer">
-                                        Epson 008 Compatible Refill Pigment...
-                                    </a>
-                                </h4>
-                                <div class="p-item-price price">
-                                    <span class="bd_currency">৳</span>
-                                    <span>5800</span>
-                                </div>
-                                <div class="actions">
-                                    <span class="btn-compare" onclick=""><i class="material-icons"></i></span>
-                                </div>
-                            </div>
-                        </div>
+                        @endif
                     </section>
                 </div>
                 <!-- related product list section end -->
@@ -1041,6 +1003,40 @@
             // Update the qty attribute on the add to cart button
             document.getElementById('add-to-cart-btn').setAttribute('qty', this.value);
         });
+
+        // Function to change main product image when clicking on thumbnails
+        function changeProductImage(element) {
+            const newImageSrc = element.getAttribute('data-image');
+            const newZoomImage = element.getAttribute('data-zoom-image');
+            
+            // Update main product image
+            const mainImage = document.getElementById('product-zoom');
+            if (mainImage) {
+                mainImage.src = newImageSrc;
+                mainImage.setAttribute('data-zoom-image', newZoomImage);
+            }
+            
+            // Update meta image for sharing
+            const metaImage = document.querySelector('meta[itemprop="image"]');
+            if (metaImage) {
+                metaImage.setAttribute('content', newImageSrc);
+            }
+            
+            // Update share image
+            const shareImage = document.getElementById('imageProductShare');
+            if (shareImage) {
+                shareImage.src = newImageSrc;
+            }
+            
+            // Remove active class from all thumbnails
+            const allThumbnails = document.querySelectorAll('.product_gallery');
+            allThumbnails.forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            
+            // Add active class to clicked thumbnail
+            element.classList.add('active');
+        }
     </script>
 
 @endsection
