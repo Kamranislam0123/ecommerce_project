@@ -235,7 +235,23 @@ class ProductController extends Controller
             } else {
                 $product_image = $product->image;
             }
-            $slug = Str::slug($request->name . '-' . time());
+            
+            // Only generate new slug if product name has changed
+            if ($product->name !== $request->name) {
+                $slug = Str::slug($request->name . '-' . time());
+                $i = 0;
+                while (true) {
+                    if (Product::where('slug', '=', $slug)->where('id', '!=', $id)->exists()) {
+                        $i++;
+                        $slug .= '_' . $i;
+                        continue;
+                    }
+                    break;
+                }
+            } else {
+                $slug = $product->slug; // Keep existing slug if name hasn't changed
+            }
+            
             $product->name = $request->name;
             $product->slug = $slug;
             // $product->code = $request->code;
