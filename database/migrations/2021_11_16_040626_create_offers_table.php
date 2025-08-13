@@ -15,8 +15,17 @@ class CreateOffersTable extends Migration
     {
         Schema::create('offers', function (Blueprint $table) {
             $table->id();
-            $table->string('offer_limit_qty',3);
-            $table->string('minimum_order_amount',10);
+            $table->string('title', 255);
+            $table->text('description')->nullable();
+            $table->enum('offer_type', ['percentage', 'fixed', 'buy_one_get_one', 'free_shipping'])->default('percentage');
+            $table->decimal('discount_value', 10, 2)->default(0);
+            $table->decimal('minimum_order_amount', 10, 2)->default(0);
+            $table->integer('offer_limit_qty')->default(0);
+            $table->datetime('start_date');
+            $table->datetime('end_date');
+            $table->boolean('is_active')->default(true);
+            $table->string('image')->nullable();
+            $table->text('terms_conditions')->nullable();
             $table->timestamps();
         });
     }
