@@ -124,6 +124,7 @@ Route::post('/clear', [CartController::class, 'clearAllCart'])->name('cart.clear
 Route::get('/remove/{id}', [CartController::class, 'removeCartAjax'])->name('cart.remove.ajax');
 Route::get('/cart-all', [CartController::class, 'cartAllData'])->name('cart.alldata');
 Route::get('/cart-content', [CartController::class, 'cartContent'])->name('cart.content');
+Route::get('/test-cart', [CartController::class, 'testCart'])->name('cart.test');
 Route::get('/cart/decrement/{id}',[CartController::class,'decrement'])->name('decrement');
 Route::get('/cart/increment/{id}',[CartController::class,'increment'])->name('increment');
 // Checkout route
@@ -335,9 +336,12 @@ Route::group(['middleware' => ['auth','userLoginCheck']] , function(){
     Route::prefix('setting')->group(function(){
             // time set route
             Route::get('/time-set',[TimeSetController::class,'setTime'])->name('set-time');
-            Route::post('/time-set-store',[TimeSetController::class,'setTimeStore'])->name('set-time.store');
-            Route::delete('/time-set-delete/{id}',[TimeSetController::class,'destroy'])->name('set-time.delete');
-            Route::get('/time-set-show/{id}',[TimeSetController::class,'show'])->name('set-time.show');
+Route::post('/time-set-store',[TimeSetController::class,'setTimeStore'])->name('set-time.store');
+Route::delete('/time-set-delete/{id}',[TimeSetController::class,'destroy'])->name('set-time.delete');
+Route::get('/time-set-show/{id}',[TimeSetController::class,'show'])->name('set-time.show');
+Route::post('/time-set-toggle/{id}',[TimeSetController::class,'toggleStatus'])->name('set-time.toggle');
+Route::put('/time-set-update/{id}',[TimeSetController::class,'updateTime'])->name('set-time.update');
+Route::get('/delivery-times',[TimeSetController::class,'getDeliveryTimes'])->name('delivery-times.all');
             // company profile 
             Route::get('company-profile', [ContentController::class, 'edit'])->name('profile.edit');
             Route::put('company-profile/{company}', [ContentController::class, 'update'])->name('profile.update');
