@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Customer extends Authenticatable implements JWTSubject
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['name','phone','email','district_id','thana_id','address','country_id','area_id','profile_picture','thub_picture','username','password','status','save_by','updated_by'];
+    protected $fillable = ['name','phone','email','district_id','thana_id','address','country_id','area_id','profile_picture','thub_picture','username','password','status','save_by','updated_by','otp','isVerified','code','ip_address'];
 
 
 
