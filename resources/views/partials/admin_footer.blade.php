@@ -6,7 +6,7 @@
                    <p class="mb-0 py-2">Copyright &copy; {{ $content->company_name }} </p>
                </div>
                <div class="col-sm-6 text-right">
-                <p class="mb-0 py-2">Developed By Link Up Technology Ltd.</p> 
+                <p class="mb-0 py-2">Developed By DataScape-IT-Limited.</p> 
             </div>
            </div>
        </div>
