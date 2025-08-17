@@ -70,29 +70,35 @@ class CustomerController extends Controller
         //  dd($request->all());
         //  return;
         $request->validate([
-            'name' => 'required|min:3|max:100',
-            'phone' => 'required|unique:customers|regex:/^01[13-9][\d]{8}$/|min:11',
-            'password' => 'required|string|min:1',
+            'firstname' => 'required|min:2|max:50',
+            'lastname' => 'required|min:2|max:50',
+            'email' => 'required|email|unique:customers',
+            'telephone' => 'required|unique:customers,phone|regex:/^01[13-9][\d]{8}$/|min:11',
+            'password' => 'nullable|min:6',
             'district_id' => 'required',
             'thana_id' => 'required',
             'area_id' => 'required',
-            'ip_address' => 'max:15'
+            'address' => 'required|min:10',
         ]);
+        
         $otp = rand(1000,9999);
         $message = "হাসিফা শপ অ্যাকাউন্ট রেজিস্টার পিন $otp .দয়া করে এটা শেয়ার করবেন না।";
         $customer = new Customer();
-        $code = 'C' . $this->generateCode('Customer');
-        $customer->name = $request->name;
+        
+        // Combine firstname and lastname
+        $customer->name = $request->firstname . ' ' . $request->lastname;
         $customer->email = $request->email;
-        $customer->phone = $request->phone;
+        $customer->phone = $request->telephone;
         $customer->address = $request->address;
         $customer->district_id = $request->district_id;
         $customer->thana_id = $request->thana_id;
         $customer->area_id = $request->area_id;
-        $customer->username = $request->phone;
-        $customer->password = Hash::make($request->password);
+        $customer->username = $request->telephone;
+        // Use provided password or phone number as default
+        $password = $request->password ?: $request->telephone;
+        $customer->password = Hash::make($password);
         $customer->ip_address = $request->ip();
-        $customer->code = $code;
+        $customer->code = 'C' . time(); // Simple code generation
         $customer->save_by = 0;
         $customer->otp = $otp;
         $customer->updated_by = 0;
@@ -106,14 +112,15 @@ class CustomerController extends Controller
         // }
 
         // $customer->save();
-        $credential = $request->only('password');
-        $credential['phone'] = $request->phone;
+        $credential = [];
+        $credential['phone'] = $request->telephone;
+        $credential['password'] = $password; // Use the actual password
           
         if (Auth::guard('customer')->attempt($credential)) {
-            session()->flash('message', ' Successfully created your account  !');
+            session()->flash('message', ' Successfully created your account!');
             return redirect()->route('customer.panel');
         } else {
-            return back()->with('error','Unsuccessfull !');
+            return back()->with('error','Account created but login failed. Please try logging in with your credentials.');
         }
 
     }
@@ -238,8 +245,16 @@ class CustomerController extends Controller
     public function customerPanel()
     {
         if (Auth::guard('customer')->check()) {
-            $order = Order::with('orderDetails')->where('customer_id', Auth::guard('customer')->user()->id)->latest()->get();
-            return view('website.customer.dashboard', compact('order'));
+            $orders = Order::where('customer_id', Auth::guard('customer')->user()->id)
+                          ->latest()
+                          ->get();
+            
+            // Load order details separately to avoid join issues
+            foreach ($orders as $order) {
+                $order->load('orderDetails');
+            }
+            
+            return view('website.customer.dashboard', compact('orders'));
         } else {
             return redirect()->route('home');
         }
