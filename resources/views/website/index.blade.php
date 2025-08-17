@@ -211,71 +211,16 @@
             <h2 class="m-header">Featured Category</h2>
             <p class="m-blurb">Get Your Desired Product from Featured Category!</p>
             <div class="cat-items-wrap">
+                @foreach($category->take(8) as $cat)
                 <div class="cat-item">
-                    <a class="cat-item-inner" href="photocopy-machine.html">
+                    <a class="cat-item-inner" href="{{ route('categoryWise.list', $cat->slug) }}">
                         <span class="cat-icon">
-                            <img alt="Photocopy Machine" height="48" src="{{asset('image/17347827253425.png')}}"
-                                width="48" />
+                            <img alt="{{ $cat->name }}" height="48" src="{{asset($cat->image)}}" width="48" />
                         </span>
-                        <p>Photocopy Machine</p>
+                        <p>{{ $cat->name }}</p>
                     </a>
                 </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="gadget.html">
-                        <span class="cat-icon">
-                            <img alt="Gadget" height="48" src="{{asset('image/17347827068034.png')}}" width="48" />
-                        </span>
-                        <p>Gadget</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="printer.html">
-                        <span class="cat-icon">
-                            <img alt="Printer" height="48" src="{{asset('image/17347827543921.png')}}" width="48" />
-                        </span>
-                        <p>Printer</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="toner.html">
-                        <span class="cat-icon">
-                            <img alt="Toner" height="48" src="{{asset('image/17347832243764.png')}}" width="48" />
-                        </span>
-                        <p>Toner</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="inkjet-ink.html">
-                        <span class="cat-icon">
-                            <img alt="InkJet Ink" height="48" src="{{asset('image/17347826914758.png')}}" width="48" />
-                        </span>
-                        <p>InkJet Ink</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="office-equipment.html">
-                        <span class="cat-icon">
-                            <img alt="Office Equipment" height="48" src="{{asset('image/17347830424634.png')}}" width="48" />
-                        </span>
-                        <p>Office Equipment</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="cartidge.html">
-                        <span class="cat-icon">
-                            <img alt="Cartidge" height="48" src="{{asset('image/17347832716458.png')}}" width="48" />
-                        </span>
-                        <p>Cartidge</p>
-                    </a>
-                </div>
-                <div class="cat-item">
-                    <a class="cat-item-inner" href="machinery.html">
-                        <span class="cat-icon">
-                            <img alt="Machinery" height="48" src="{{asset('image/17348413718619.png')}}" width="48" />
-                        </span>
-                        <p>Machinery</p>
-                    </a>
-                </div>
+                @endforeach
             </div>
         </div>
         <div class="m-product m-home" id="module-481">
@@ -287,7 +232,7 @@
                 <div class="p-item item">
                     <div class="p-item-inner">
                         <div class="marks">
-                            <span class="mark">Save: {{ $item->discount > 0 ? $item->discount : 0.00 }} ৳</span>
+                            <span class="mark">Save: {{ $item->discount > 0 ? $item->discount : 0.00 }} %</span>
                         </div>
                         <div class="marks2">
                             <span class="mark2"> Top</span>
