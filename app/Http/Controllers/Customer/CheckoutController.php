@@ -190,7 +190,7 @@ class CheckoutController extends Controller
                 'billing_address' => 'required|string',
                 'shipping_address' => 'required|string',
                 'delivery_date' => 'required|string',
-                'time_id' => 'required|exists:delivery_times,id',
+                'time_id' => 'nullable|exists:delivery_times,id',
                 'total_amount' => 'required|numeric|min:0'
             ]);
             \Log::info('Validation passed successfully');
@@ -484,12 +484,13 @@ class CheckoutController extends Controller
                 DB::commit();
                 \Log::info('Database transaction committed successfully');
                 
-                Session::flash('message', 'Order submitted successfully! Invoice No: ' . $invoice_no);
+                Session::flash('success', 'Order submitted successfully! Invoice No: ' . $invoice_no);
+                Session::flash('new_order_id', $order->id);
                 \Cart::clear();
                 \Log::info('Cart cleared successfully');
 
                 \Log::info('=== ORDER STORE FUNCTION COMPLETED SUCCESSFULLY ===');
-                return redirect()->route('customer.panel');
+                return redirect()->route('customer.panel')->with('active_tab', 'orders');
 
             } 
             catch (Exception $e) {
