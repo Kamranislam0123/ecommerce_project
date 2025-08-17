@@ -14,53 +14,193 @@ class TimeSeeder extends Seeder
      */
     public function run()
     {
-        
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '10 AM - 11 AM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '11 AM - 12 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '12 PM - 01 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '01 PM - 02 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '02 PM - 03 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '03 PM - 04 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '04 PM - 05 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '1',
-                'time' => '05 PM - 06 PM',
-            ]);
+        // Saturday (group_id = 1)
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '1',
+            'time' => '16:00 - 17:00',
+            'is_active' => true,
+        ]);
 
-            DeliveryTime::create([
-                'group_id'  => '2',
-                'time' => '04 PM - 05 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '2',
-                'time' => '05 PM - 06 PM',
-            ]);
-            DeliveryTime::create([
-                'group_id'  => '2',
-                'time' => '06 PM - 07 PM',
-            ]);
-        
+        // Sunday (group_id = 2)
+        DeliveryTime::create([
+            'group_id'  => '2',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '2',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '2',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '2',
+            'time' => '16:00 - 17:00',
+            'is_active' => true,
+        ]);
 
+        // Monday (group_id = 3)
+        DeliveryTime::create([
+            'group_id'  => '3',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '3',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '3',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '3',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '3',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+
+        // Tuesday (group_id = 4)
+        DeliveryTime::create([
+            'group_id'  => '4',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '4',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '4',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '4',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '4',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+
+        // Wednesday (group_id = 5)
+        DeliveryTime::create([
+            'group_id'  => '5',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '5',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '5',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '5',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '5',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+
+        // Thursday (group_id = 6)
+        DeliveryTime::create([
+            'group_id'  => '6',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '6',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '6',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '6',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '6',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
+
+        // Friday (group_id = 7)
+        DeliveryTime::create([
+            'group_id'  => '7',
+            'time' => '09:00 - 10:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '7',
+            'time' => '10:00 - 11:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '7',
+            'time' => '11:00 - 12:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '7',
+            'time' => '14:00 - 15:00',
+            'is_active' => true,
+        ]);
+        DeliveryTime::create([
+            'group_id'  => '7',
+            'time' => '15:00 - 16:00',
+            'is_active' => true,
+        ]);
     }
 }
