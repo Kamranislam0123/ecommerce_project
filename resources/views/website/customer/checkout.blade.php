@@ -1,5 +1,8 @@
 @extends('layouts.website')
 @section('website-css')
+@push('website-css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
+@endpush
 {{-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"> --}}
 <style>
     :root {
@@ -314,9 +317,9 @@ input {
              <p class="p2 text-danger"></p>
             </div>
         <div class="group-inputs"> <label for="position">Email</label> 
-             <input type="text"  name="email" value="{{Auth::guard('customer')->user()->email}}"  placeholder="Enter Email "  ></div>
+             <input type="text"  name="customer_email" value="{{Auth::guard('customer')->user()->email}}"  placeholder="Enter Email "  ></div>
         <div class="group-inputs"> <label for="position">District</label>  
-            <select  id="district_id" class="form-control" id="district_id" required >
+            <select id="district_id" class="form-control" required >
                 <option value="">Select District </option>
                     @foreach ($district as $item)
                     <option value="{{$item->id}}" {{Auth::guard('customer')->user()->district_id == $item->id?'selected':'' }}>{{$item->name}} </option>
@@ -326,7 +329,7 @@ input {
         </div>
         <div class="group-inputs"> <label for="position" >Thana<span class="text-danger">*</span></label>  
             <select  name="thana_id" id="thana_id" class="form-control" id="thana_id" required >
-                @if(isset(Auth::guard('customer')->user()->thana_id))
+                @if(isset(Auth::guard(name: 'customer')->user()->thana_id))
                 <option value="{{Auth::guard('customer')->user()->thana_id}}">{{Auth::guard('customer')->user()->thana->name ?? ''}}</option>
                 @endif
             </select>
@@ -349,9 +352,10 @@ input {
             <input type="text" name="shipping_address" id="shipping_address" value="{{Auth::guard('customer')->user()->address}}"  class="form-control " placeholder="Billing address *" placeholder="Shipping Address">
             <p class="p7 text-danger"></p>   
         </div>
-        
-      
-        <div class=""> <a href="javascript:void();" class="my-btn btn-next width-50 ml-auto" id="first_step">Next</a> </div>
+<input type="hidden" name="district_id" id="district_id_hidden" value="{{ old('district_id', Auth::guard('customer')->user()->district_id) }}">
+
+
+        <div class="step-forms-active"> <a href="javascript:void(0)" class="my-btn btn-next width-50 ml-auto" id="first_step">Next</a> </div>
     </div>
     <div class="step-forms">
         <?php 
@@ -363,14 +367,13 @@ input {
 
         </div>
 
-        <div class="group-inputs"> <label for="position">Select Time<span class="text-danger">*</span></label>  
-            <select name="time_id" id="group_id" class=" form-control"  required>
-                @foreach ($time as $item)
-                    <option value="{{$item->group_id}}">{{$item->time}}</option>
-                @endforeach
-               
-            </select>
-        </div>
+                 <div class="group-inputs"> 
+             <label for="time_id">Select Time<span class="text-danger">*</span></label>  
+             <select name="time_id" id="time_id" class="form-control" required disabled>
+                 <option value="">Please select a date first</option>
+             </select>
+             <small class="text-muted" id="time-help">Available delivery times will appear after selecting a date</small>
+         </div>
         
 
         <div class="btns-group"> <a href="#" class="my-btn btn-prev">Previous</a> <a href="#" class="my-btn btn-next" onclick="secondStep()">Next</a> </div>
@@ -420,7 +423,7 @@ input {
                     <?php
                     //  $total = array_sum($item->price);
                     ?>
-                    <input type="hidden" name="total amount" value="{{$sum}}">
+                    <input type="hidden" name="total_amount" value="{{$sum}}">
                     <td class="text-end"> {{$sum}} + <span class="shipping_charge">
                          @if(Auth::guard('customer')->user()->area_id)
                         {{Auth::guard('customer')->user()->area->amount ?? ''}}</span> @endif<span>Tk</span> </td>
@@ -431,6 +434,7 @@ input {
         <div class="btns-group"> <a href="#" class="my-btn btn-prev">Previous</a> @if( $sum >= $offer->minimum_order_amount )
             
             <input type="submit" value="Place Order" id="submit-form" class="my-btn" /> 
+            
            
             @else 
             <a href="{{route('home')}}" class="my-btn">Continue Shopping </a>
@@ -440,14 +444,17 @@ input {
 
 @endsection
 @push('website-js')
-{{-- <script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
+
+<script>
      var today = new Date();
      $('#date').datepicker('setDate', today);
-</script> --}}
+</script> 
 <script type="text/javascript">
     //  Get Subject Javascript
     $(document).on("change","#district_id",function(){
       var district_id = $("#district_id").val();
+       $("#district_id_hidden").val(district_id); 
       console.log(district_id);
         $.ajax({
             url:"{{route('thana.change')}}",
@@ -479,7 +486,7 @@ input {
     //     if (name.length == 0) {
     //         alert('bozzat');
     //         $("#p1").text("Please enter your Name");
-           
+
     //     } 
     //     return false;
     //   });
@@ -500,6 +507,7 @@ input {
     //  Get Subject Javascript
     $(document).on("change","#district_id",function(){
       var district_id = $("#district_id").val();
+ $("#district_id_hidden").val(district_id); 
       console.log(district_id);
         $.ajax({
           url:"{{route('thana.change')}}",
@@ -554,38 +562,99 @@ input {
         showButtonPanel: true,
         minDate: 0,
         dateFormat: 'dd-mm-yy /DD',
-        onSelect: function(dateText, inst) {
-         var today = new Date(dateText);
-         var day = d[today.getDay()];
-         console.log(d[dateText]);
-         var input_day = $('#date').val();
-         var day_pass = $(this).datepicker('getDate').toString();
-         var day_pass = day_pass.substring(0, 3);
-        //  console.log(day_pass);
-         console.log(day_pass.substring(0, 3));
-        $.ajax({
-               url:"{{route('time.show')}}",
-                   type:"get",
-                   data:{"day_pass" : day_pass},
-                   dataType: "json",
-                   success:function(res){
-                       console.log(res);
-                       var html = '<option value="">Select Time </option>';
-                       $.each(res,function(key,v){
-                       html += '<option value="'+v.id+'">'+v.time+' </option>';
-                       });
-                       $("#group_id").html(html);
-                   }
-              })
-       }
+                 onSelect: function(dateText, inst) {
+          var today = new Date(dateText);
+          var day = d[today.getDay()];
+          console.log('Selected day:', day);
+          var input_day = $('#date').val();
+          var day_pass = $(this).datepicker('getDate').toString();
+          var day_pass = day_pass.substring(0, 3);
+          console.log('Day pass:', day_pass);
+          
+          // Show loading state
+          $('#time_id').html('<option value="">Loading available times...</option>').prop('disabled', true);
+          $('#time-help').text('Loading available delivery times...');
+          
+          $.ajax({
+                url:"{{route('time.show')}}",
+                type:"get",
+                data:{"day_pass" : day_pass},
+                dataType: "json",
+                success:function(res){
+                    console.log('Available times:', res);
+                    if(res && res.length > 0) {
+                        var html = '<option value="">Select Delivery Time</option>';
+                        $.each(res,function(key,v){
+                            // Format time for better display
+                            var timeDisplay = formatTimeForDisplay(v.time);
+                            html += '<option value="'+v.id+'">'+timeDisplay+'</option>';
+                        });
+                        $("#time_id").html(html).prop('disabled', false);
+                        $('#time-help').text('Select your preferred delivery time for ' + day);
+                    } else {
+                        $("#time_id").html('<option value="">No delivery times available</option>').prop('disabled', true);
+                        $('#time-help').text('No delivery times available for this date. Please select another date.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching times:', error);
+                    $("#time_id").html('<option value="">Error loading times</option>').prop('disabled', true);
+                    $('#time-help').text('Error loading delivery times. Please try again.');
+                }
+           })
+        }
    
      });
     
+    // Function to format time for display (convert 24h to 12h format)
+    function formatTimeForDisplay(timeString) {
+        if (!timeString) return '';
+        
+        // Check if it's already in 12-hour format
+        if (timeString.includes('AM') || timeString.includes('PM')) {
+            return timeString;
+        }
+        
+        // Convert 24-hour format to 12-hour format
+        var time = new Date('2000-01-01T' + timeString);
+        var hours = time.getHours();
+        var minutes = time.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return hours + ':' + minutes + ' ' + ampm;
+    }
+    
+    // Handle time selection change
+    $(document).on('change', '#time_id', function() {
+        var selectedTime = $(this).find('option:selected').text();
+        var selectedDate = $('#date').val();
+        
+        if(selectedTime && selectedTime !== 'Select Delivery Time' && selectedTime !== 'Loading available times...' && selectedTime !== 'No delivery times available' && selectedTime !== 'Error loading times') {
+            // Show success message
+            showTimeSelectionMessage('Delivery time selected: ' + selectedTime);
+        }
+    });
+    
+    // Function to show time selection message
+    function showTimeSelectionMessage(message) {
+        // Create a temporary message element
+        var messageDiv = $('<div class="alert alert-success alert-dismissible fade show" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">' + 
+                          message + 
+                          '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+        $('body').append(messageDiv);
+        
+        // Auto remove after 3 seconds
+        setTimeout(function() {
+            messageDiv.alert('close');
+        }, 3000);
+    }
          
    });
     </script>
    
-    <script>
+<script>
 const prevBtns = document.querySelectorAll(".btn-prev");
 const nextBtns = document.querySelectorAll(".btn-next");
 const progress = document.getElementById("progress");
@@ -594,7 +663,6 @@ const progressSteps = document.querySelectorAll(".progress-step");
 
 
 let formStepsNum = 0;
-
 nextBtns.forEach((btn) => {
 btn.addEventListener("click", () => {
         var name = $('#name').val();
