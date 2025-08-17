@@ -25,6 +25,187 @@
     .user-icon-logged {
         color: #ff6b35 !important;
     }
+    
+               /* Header layout fixes */
+      .top .container {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          gap: 30px;
+          padding: 15px 0;
+      }
+     
+           .ht-item.logo {
+          flex: 0 0 auto;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          
+          margin-left: 20px;
+      }
+     
+           .ht-item.search {
+          flex: 1;
+          max-width: 600px;
+          min-width: 350px;
+          margin: 0 20px;
+      }
+    
+         .ht-item.q-actions {
+         flex: 0 0 auto;
+         display: flex;
+         align-items: center;
+         
+         margin-right: 20px;
+     }
+    
+         .ht-item.q-actions .ac {
+         display: flex;
+         align-items: center;
+        
+         color: white;
+         text-decoration: none;
+         padding: 6px 10px;
+         border-radius: 6px;
+         transition: all 0.3s ease;
+         min-width: 80px;
+     }
+     
+     .ht-item.q-actions .ac:hover {
+         background: rgba(255,255,255,0.1);
+         color: white;
+         text-decoration: none;
+     }
+     
+     .ht-item.q-actions .ac .ic {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         flex-shrink: 0;
+     }
+     
+     .ht-item.q-actions .ac-content {
+         display: flex;
+         flex-direction: column;
+         min-width: 0;
+     }
+     
+     .ht-item.q-actions .ac-content h4,
+     .ht-item.q-actions .ac-content h5 {
+         margin: 0;
+         font-size: 13px;
+         font-weight: 600;
+         color: white;
+         line-height: 1.2;
+     }
+     
+     .ht-item.q-actions .ac-content p {
+         margin: 0;
+         font-size: 11px;
+         color: #ccc;
+         line-height: 1.2;
+     }
+    
+    .ht-item.q-actions .ac-content a {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .ht-item.q-actions .ac-content a:hover {
+        color: #ff6b35;
+    }
+    
+    .cart-count {
+        background: #ff6b35 !important;
+        color: white !important;
+        font-size: 12px;
+        padding: 2px 6px !important;
+        border-radius: 12px;
+        margin-left: 2px;
+    }
+    
+         /* Responsive adjustments */
+     @media (max-width: 1200px) {
+         .ht-item.q-actions {
+             gap: 10px;
+         }
+         
+         .ht-item.q-actions .ac {
+             padding: 5px 8px;
+             min-width: 70px;
+         }
+         
+         .ht-item.q-actions .ac-content h4,
+         .ht-item.q-actions .ac-content h5 {
+             font-size: 12px;
+         }
+         
+         .ht-item.q-actions .ac-content p {
+             font-size: 10px;
+         }
+     }
+     
+     @media (max-width: 768px) {
+         .top .container {
+             flex-direction: column;
+             gap: 15px;
+             padding: 15px 0;
+         }
+         
+         .ht-item.logo {
+             min-width: auto;
+             justify-content: center;
+         }
+         
+         .ht-item.search {
+             order: 3;
+             max-width: 100%;
+             min-width: auto;
+             margin: 0;
+         }
+         
+         .ht-item.q-actions {
+             order: 2;
+             width: 100%;
+             justify-content: center;
+             gap: 20px;
+         }
+         
+         .ht-item.q-actions .ac {
+             min-width: 100px;
+             padding: 8px 12px;
+         }
+         
+         .ht-item.q-actions .ac-content h4,
+         .ht-item.q-actions .ac-content h5 {
+             font-size: 13px;
+         }
+         
+         .ht-item.q-actions .ac-content p {
+             font-size: 11px;
+         }
+     }
+     
+     @media (max-width: 480px) {
+         .ht-item.q-actions {
+             gap: 10px;
+         }
+         
+         .ht-item.q-actions .ac {
+             min-width: 80px;
+             padding: 6px 8px;
+         }
+         
+         .ht-item.q-actions .ac-content h4,
+         .ht-item.q-actions .ac-content h5 {
+             font-size: 11px;
+         }
+         
+         .ht-item.q-actions .ac-content p {
+             font-size: 9px;
+         }
+     }
 </style>
         <div class="top">
             <div class="container">
@@ -36,7 +217,7 @@
                             <span></span>
                         </div>
                     </div>
-                    <a href="{{route('home')}}"> <img alt=" " height="" src="{{asset('/')}}image/Corporate Logo (1).png" title=""
+                    <a href="{{route('home')}}"> <img alt=" " height="" src="{{asset('/')}}image/DataScape-IT-Limited.png" title=""
                             width="" /></a>
                     <div class="mbl-right h-desk">
                         <div class="ac search-toggler" style="color:white"><i class="fa fa-search"></i></div>
@@ -69,7 +250,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="ht-item q-actions" >
+                <div class="ht-item q-actions">
                     <a class="ac h-offer-icon" href="{{ route('offers') }}">
                         <div class="ic">
                             <img alt="Offers" src="{{asset('/')}}image/offer.gif" style="width: 35px; height: 30px;" />
