@@ -120,7 +120,7 @@
                                             <th>Action</th>
                                         </tr>
                                         <tbody>
-                                            @foreach ($order as $item)
+                                            @foreach ($orders as $item)
                                                 <tr>
                                                     <td>{{$item->invoice_no}}</td>
                                                     <td>{{$item->created_at->format('d/m/y')}}</td>
