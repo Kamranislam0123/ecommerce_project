@@ -57,6 +57,17 @@
                                         </span>
                                         @enderror
                                     </div>
+                                    
+                                    <div class="form-group p-1">
+                                        <label for="input-password">Password</label>
+                                        <input type="password" name="password" value="{{ old('password') }}" placeholder="Password" id="input-password" class="form-control px-3 @error('password') is-invalid @enderror">
+                                        <small class="form-text text-muted">Leave blank to use phone number as password</small>
+                                        @error('password')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <!-- Right Section: Telephone, District, Thana, Area, Address -->
