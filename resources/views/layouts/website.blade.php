@@ -29,6 +29,7 @@
     <link href="{{ asset('website/css/all.min.css') }}" rel="stylesheet"/></link>
     <link href="{{ asset('website/css/toastr.min.css') }}" rel="stylesheet" id="galio-skin">
     @yield('website-css') 
+    @stack('website-css')
 </head>
 
 <body class="common-home product-category-20">
@@ -50,8 +51,10 @@
         src="{{ asset('website/js/bootstrap.bundle.min.js') }}">
         </script>
     <script src="{{ asset('website/js/jquery.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script src="{{ asset('website/js/all.min.js') }}"></script>
-    <script src="{{ asset('website/js/custom.js') }}"></script>
+    <!-- <script src="{{ asset('website/js/custom.js') }}"></script> -->
     <script src="{{ asset('website/js/site.min.26.js') }}"></script>
     <script src="{{ asset('website/js/owl.carousel.min.js') }}"></script>
     <input id="cart_total_qty" type="hidden" value="0" />
@@ -60,22 +63,55 @@
 
     {{-- toster --}}
     <script src="{{ asset('website/js/toastr.min.js') }}"></script>
-   <script>
+    <script>
+        // Configure toastr positioning
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-center",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    </script>
+    <style>
+        .cart-updated {
+            animation: cartPulse 0.3s ease-in-out;
+        }
+        
+        @keyframes cartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); background-color: #28a745 !important; color: white !important; }
+            100% { transform: scale(1); }
+        }
+    </style>
+       <script>
+        // Initialize jQuery noConflict
+        var $j = jQuery.noConflict();
+        
         // $("#buyNowModal").modal('show');
-        $(".add_to_cart_single_qty").on('click', function (event) {
+        $j(".add_to_cart_single_qty").on('click', function (event) {
             //alert('ok');
             event.preventDefault();
-            $j = jQuery.noConflict();
-            var product_name = $(this).attr('product_name');
-            var product_price = parseFloat($(this).attr('product_price'));
-            var product_sku = $(this).attr("product_sku");
-            var product_color = $(this).attr("product_color")
-            var product_size = $(this).attr("product_size")
-            var id = $(this).attr('product-id');
-            var qty = $(this).attr('qty');
-            var max_order_qty = $(this).attr('max_order_qty');
+            var product_name = $j(this).attr('product_name');
+            var product_price = parseFloat($j(this).attr('product_price'));
+            var product_sku = $j(this).attr("product_sku");
+            var product_color = $j(this).attr("product_color")
+            var product_size = $j(this).attr("product_size")
+            var id = $j(this).attr('product-id');
+            var qty = $j(this).attr('qty');
+            var max_order_qty = $j(this).attr('max_order_qty');
             if (parseInt(max_order_qty) < parseInt(qty)) {
-                alert('You can not order more than ' + max_order_qty)
+                toastr.error('You can not order more than ' + max_order_qty);
                 return false;
             }
             var url = 'https://www.corporatetechbd.com/product/add/cart';
@@ -90,13 +126,21 @@
                 function (data, status) {
                     console.log(data);
                     if (data.flash_message_error) {
-                        alert('Something went wrong.');
+                        toastr.error('Something went wrong.');
                     } else {
                         $j(".buy_now_modal_product_name").text(product_name);
                         $j(".buy_now_modal_product_qty").text((cart_total_qty + 1));
                         $j(".buy_now_modal_sub_total").text((cart_sub_total + product_price));
                         $j(".buy_now_modal_message").hide();
                         $j("#buyNowModal").modal('show');
+                        
+                        // Update cart count in header
+                        updateCartCount();
+                        
+                        // If we're on the cart page, update cart totals too
+                        if (window.location.pathname === '/cart') {
+                            updateCartTotals();
+                        }
                     }
                 },
                 'json'
@@ -107,10 +151,9 @@
         });
     </script>
     <script>
-        $('.remove_from_cart').on('click', function () {
-            var id = $(this).data("id");
+        $j('.remove_from_cart').on('click', function () {
+            var id = $j(this).data("id");
             // alert(id);
-            $j = jQuery.noConflict();
             var url = 'https://www.corporatetechbd.com/website/cart/item/remove';
             $j.post(url, {
                 id: id,
@@ -121,6 +164,9 @@
                     // console.log('status : ' + status);
                     // alert('Data remove successfully.');
                     window.location.reload();
+                    
+                    // Update cart count in header
+                    updateCartCount();
                 },
                 'json'
             );
@@ -128,15 +174,13 @@
     </script>
     <script>
 
-        $('.home_popup_close_btn, #bodycontent').on('click', function () {
-
-            $j = jQuery.noConflict();
+        $j('.home_popup_close_btn, #bodycontent').on('click', function () {
 
             $j.ajaxSetup({
 
                 headers: {
 
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
 
                 }
 
@@ -167,26 +211,22 @@
     </script>
     <script>
 
-        $('#product_search_1').on('keyup', function () {
+        $j('#product_search_1').on('keyup', function () {
 
-            var searched_data = $(this).val();
+            var searched_data = $j(this).val();
 
             if (searched_data.trim() === "") {
 
-                $('#cmpr_dropdown_1').hide();
+                $j('#cmpr_dropdown_1').hide();
 
                 return;
 
             }
 
-            $j = jQuery.noConflict();
-
             $j.ajaxSetup({
 
                 headers: {
-
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-
+                    'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
                 }
 
             });
@@ -203,19 +243,19 @@
 
                     console.log('output : ' + data);
 
-                    $('#cmpr_dropdown_1').html(data).show();
+                    $j('#cmpr_dropdown_1').html(data).show();
 
-                    $('.com_product_1').on('click', function () {
+                    $j('.com_product_1').on('click', function () {
 
-                        var product_id = $(this).data('product_id');
+                        var product_id = $j(this).data('product_id');
 
-                        var product_name = $(this).text();
+                        var product_name = $j(this).text();
 
-                        $('#product_1').val(product_id);
+                        $j('#product_1').val(product_id);
 
-                        $('#product_search_1').val(product_name);
+                        $j('#product_search_1').val(product_name);
 
-                        $('#cmpr_dropdown_1').hide();
+                        $j('#cmpr_dropdown_1').hide();
 
                     });
 
@@ -231,19 +271,17 @@
 
         });
 
-        $('#product_search_2').on('keyup', function () {
+        $j('#product_search_2').on('keyup', function () {
 
-            var searched_data = $(this).val();
+            var searched_data = $j(this).val();
 
             if (searched_data.trim() === "") {
 
-                $('#cmpr_dropdown_2').hide();
+                $j('#cmpr_dropdown_2').hide();
 
                 return;
 
             }
-
-            $j = jQuery.noConflict();
 
             $j.ajax({
 
@@ -257,19 +295,19 @@
 
                     console.log('output : ' + data);
 
-                    $('#cmpr_dropdown_2').html(data).show();
+                    $j('#cmpr_dropdown_2').html(data).show();
 
-                    $('.com_product_2').on('click', function () {
+                    $j('.com_product_2').on('click', function () {
 
-                        var product_id = $(this).data('product_id');
+                        var product_id = $j(this).data('product_id');
 
-                        var product_name = $(this).text();
+                        var product_name = $j(this).text();
 
-                        $('#product_2').val(product_id);
+                        $j('#product_2').val(product_id);
 
-                        $('#product_search_2').val(product_name);
+                        $j('#product_search_2').val(product_name);
 
-                        $('#cmpr_dropdown_2').hide();
+                        $j('#cmpr_dropdown_2').hide();
 
                     });
 
@@ -285,59 +323,59 @@
 
         });
 
-        $('#product_search_1').on('focus', function () {
+        $j('#product_search_1').on('focus', function () {
 
-            var searched_data = $(this).val();
+            var searched_data = $j(this).val();
 
             if (searched_data.trim() !== "") {
 
-                $('#cmpr_dropdown_1').show();
+                $j('#cmpr_dropdown_1').show();
 
-                $('#cmpr_dropdown_2').hide();
+                $j('#cmpr_dropdown_2').hide();
 
             }
 
         });
 
-        $('#product_search_2').on('focus', function () {
+        $j('#product_search_2').on('focus', function () {
 
-            var searched_data = $(this).val();
+            var searched_data = $j(this).val();
 
             if (searched_data.trim() !== "") {
 
-                $('#cmpr_dropdown_2').show();
+                $j('#cmpr_dropdown_2').show();
 
-                $('#cmpr_dropdown_1').hide();
+                $j('#cmpr_dropdown_1').hide();
 
             }
 
         });
 
-        $('.com_product_1').on('click', function () {
+        $j('.com_product_1').on('click', function () {
 
-            var product_id = $(this).data('product_id');
+            var product_id = $j(this).data('product_id');
 
-            var product_name = $(this).text();
+            var product_name = $j(this).text();
 
-            $('#product_1').val(product_id);
+            $j('#product_1').val(product_id);
 
-            $('#product_search_1').val(product_name);
+            $j('#product_search_1').val(product_name);
 
-            $('#cmpr_dropdown_1').hide();
+            $j('#cmpr_dropdown_1').hide();
 
         });
 
-        $('.com_product_2').on('click', function () {
+        $j('.com_product_2').on('click', function () {
 
-            var product_id = $(this).data('product_id');
+            var product_id = $j(this).data('product_id');
 
-            var product_name = $(this).text();
+            var product_name = $j(this).text();
 
-            $('#product_2').val(product_id);
+            $j('#product_2').val(product_id);
 
-            $('#product_search_2').val(product_name);
+            $j('#product_search_2').val(product_name);
 
-            $('#cmpr_dropdown_2').hide();
+            $j('#cmpr_dropdown_2').hide();
 
         });
 
@@ -359,24 +397,24 @@
                 }
             });
         });
-        $('.search-toggler').on('click', function () {
+        $j('.search-toggler').on('click', function () {
             // alert('ok');
-            if ($('.search').hasClass('d-block')) {
-                $('.search').removeClass('d-block');
+            if ($j('.search').hasClass('d-block')) {
+                $j('.search').removeClass('d-block');
             } else {
-                $('.search').addClass('d-block');
-                $('.search').css('position', 'fixed');
-                $('.search').css('width', '100%');
+                $j('.search').addClass('d-block');
+                $j('.search').css('position', 'fixed');
+                $j('.search').css('width', '100%');
             }
         });
     </script>
     <script>
-        $('#nav-toggler').on('click', function () {
+        $j('#nav-toggler').on('click', function () {
             // alert('ok');
-            if ($('nav').hasClass('open')) {
-                $('nav').removeClass('open');
+            if ($j('nav').hasClass('open')) {
+                $j('nav').removeClass('open');
             } else {
-                $('nav').addClass('open');
+                $j('nav').addClass('open');
             }
         });
     </script>
@@ -435,18 +473,17 @@
         })(jQuery);
     </script>
     <script>
-        $('#searching_product_data').on('keyup', function () {
-            $('#dropdown-menu1').show();
-            $j = jQuery.noConflict();
-            var searched_data = $('#searching_product_data').val();
+        $j('#searching_product_data').on('keyup', function () {
+            $j('#dropdown-menu1').show();
+            var searched_data = $j('#searching_product_data').val();
             // console.log(searched_data);
             $j.ajaxSetup({
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
                 }
             });
             if (searched_data == '') {
-                $('#dropdown-menu1').hide();
+                $j('#dropdown-menu1').hide();
             } else {
                 // console.log(searched_data);
                 $j.ajax({
@@ -458,7 +495,7 @@
                     },
                     success: function (data) {
                         // console.log('data : ' + data);
-                        $('#search_product_details').html(data);
+                        $j('#search_product_details').html(data);
                     },
                     errors: function (error) {
                         console.log(error);
@@ -468,27 +505,143 @@
         });
     </script>
     <script>
-        $('#suggession-product-nav').on('click', function () {
-            $('#tab-prod').show();
-            $('#tab-cat').hide();
-            $('#suggession-product-nav').addClass('active');
-            $('#suggession-cat-nav').removeClass('active');
+        $j('#suggession-product-nav').on('click', function () {
+            $j('#tab-prod').show();
+            $j('#tab-cat').hide();
+            $j('#suggession-product-nav').addClass('active');
+            $j('#suggession-cat-nav').removeClass('active');
         });
-        $('#suggession-cat-nav').on('click', function () {
+        $j('#suggession-cat-nav').on('click', function () {
             // $('#search').show();
-            $('#tab-cat').show();
-            $('#tab-prod').hide();
-            $('#suggession-product-nav').removeClass('active');
-            $('#suggession-cat-nav').addClass('active');
+            $j('#tab-cat').show();
+            $j('#tab-prod').hide();
+            $j('#suggession-product-nav').removeClass('active');
+            $j('#suggession-cat-nav').addClass('active');
         });
-        $('#bodycontent').on('click', function () {
-            $('#dropdown-menu1').hide();
+        $j('#bodycontent').on('click', function () {
+            $j('#dropdown-menu1').hide();
         });
-        $('#bodycontent').on('mouseover', function () {
-            $('#dropdown-menu2').hide();
+        $j('#bodycontent').on('mouseover', function () {
+            $j('#dropdown-menu2').hide();
         });
     </script>
     <script>
+        // Add to Cart Function
+function addToCard(productId) {
+    var $j = jQuery.noConflict();
+    console.log('Adding product to cart:', productId);
+    
+    $j.ajax({
+        url: '/cart-add/' + productId,  // Ensure this route exists and is correct
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Cart add response:', response);
+            if (response.success) {
+                // Show success message
+                toastr.success('Product added to cart successfully!');
+                
+                // Update cart count in the header dynamically
+                updateCartCount();
+                
+                // If we're on the cart page, update cart totals too
+                if (window.location.pathname === '/cart') {
+                    updateCartTotals();
+                }
+            } else {
+                // Show error if the server returns an error response
+                toastr.error('Error adding product to cart: ' + (response.error || 'Unknown error'));
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', xhr.responseText);
+            console.error('Status:', status);
+            console.error('Error:', error);
+
+            // Try to parse the JSON response from the server
+            try {
+                var response = JSON.parse(xhr.responseText);
+                toastr.error('Error adding product to cart: ' + (response.error || error));
+            } catch (e) {
+                // In case the server did not send a JSON response
+                toastr.error('Error adding product to cart: ' + error);
+            }
+        }
+    });
+}
+
+function updateCartCount() {
+    var $j = jQuery.noConflict();
+    console.log('Updating cart count...');
+    // Use the existing cart-content route to fetch updated cart data
+    $j.ajax({
+        url: '/cart-content',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Cart count response:', response);
+            if (response.total_item !== undefined) {
+                // Update the cart count displayed in the header
+                $j('.cart-count').text(response.total_item);
+                console.log('Updated cart count to:', response.total_item);
+                
+                // Add a subtle animation to show the update
+                $j('.cart-count').addClass('cart-updated');
+                setTimeout(function() {
+                    $j('.cart-count').removeClass('cart-updated');
+                }, 300);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating cart count:', error);
+            console.error('Status:', status);
+            console.error('Response:', xhr.responseText);
+        }
+    });
+}
+
+// Function to update cart totals (for use on cart page)
+function updateCartTotals() {
+    var $j = jQuery.noConflict();
+    $j.ajax({
+        url: '/cart-content',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.total_amount !== undefined) {
+                // Update cart totals if elements exist
+                if ($j('#cart-subtotal').length) {
+                    $j('#cart-subtotal').text('৳' + response.total_amount.toLocaleString());
+                }
+                if ($j('#cart-total').length) {
+                    $j('#cart-total').text('৳' + response.total_amount.toLocaleString());
+                }
+            }
+            if (response.total_item !== undefined) {
+                if ($j('#cart-total-items').length) {
+                    $j('#cart-total-items').text(response.total_item);
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error updating cart totals:', error);
+        }
+    });
+}
+
+            var $j = jQuery.noConflict();
+            $j.ajax({
+                url: '/cart-content',
+                type: 'GET',
+                success: function(response) {
+                    // Update cart count if there's a cart count element
+                    if (response.total_item) {
+                        $j('.cart-count').text(response.total_item);
+                    }
+                }
+            });
+        
+
         // back_to_top
         let mybutton = document.getElementById("back_to_top_btn");
         // When the user scrolls down 20px from the top of the document, show the button
@@ -507,8 +660,14 @@
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
+        
+        // Update cart count when page loads
+        jQuery(document).ready(function() {
+            updateCartCount();
+        });
     </script>
-<!--End of Tawk.to Script-->
+    @stack('website-js')
+    @yield('website-js')
 </body>
 
 </html>
