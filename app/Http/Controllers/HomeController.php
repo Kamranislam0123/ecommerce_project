@@ -245,21 +245,31 @@ class HomeController extends Controller
     public function timeShow(Request $request)
     {
         $d_number = $request->day_pass;
-        if ($d_number == 'Sat') {
-            return  $time = DeliveryTime::where('group_id', 1)->get();
-        } elseif ($d_number == 'Sun') {
-            return $time = DeliveryTime::where('group_id', 2)->get();
-        } elseif ($d_number == 'Mon') {
-            return $time = DeliveryTime::where('group_id', 3)->get();
-        } elseif ($d_number == 'Tue') {
-            return  $time = DeliveryTime::where('group_id', 4)->get();
-        } elseif ($d_number == 'Wed') {
-            return  $time = DeliveryTime::where('group_id', 5)->get();
-        } elseif ($d_number == 'Thu') {
-            return $time = DeliveryTime::where('group_id', 6)->get();
-        } else {
-            return  $time = DeliveryTime::where('group_id', 7)->get();
+        
+        // Map day abbreviations to group IDs
+        $dayMapping = [
+            'Sat' => 1,
+            'Sun' => 2,
+            'Mon' => 3,
+            'Tue' => 4,
+            'Wed' => 5,
+            'Thu' => 6,
+            'Fri' => 7
+        ];
+        
+        $group_id = $dayMapping[$d_number] ?? null;
+        
+        if (!$group_id) {
+            return response()->json([], 400);
         }
+        
+        // Get active delivery times for the selected day, ordered by time
+        $times = DeliveryTime::active()
+            ->forDay($group_id)
+            ->orderBy('time')
+            ->get(['id', 'time']);
+            
+        return response()->json($times);
     }
 
 public function thanaChange(Request $request)
