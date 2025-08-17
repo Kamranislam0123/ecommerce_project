@@ -1749,9 +1749,7 @@ header {
     z-index: 100;
 }
 
-header .top {
-    padding: 15px 0;
-}
+
 
 header .top .container {
     display: flex;
@@ -1789,7 +1787,7 @@ header .top .container {
 
 .ht-item.q-actions {
     flex: 0 0 550px;
-    padding: 9px 0 0 10px;
+    
 }
 
 .q-actions .ac {
