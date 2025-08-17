@@ -10,14 +10,35 @@ use Illuminate\Support\Facades\Session;
 
 class TimeSetController extends Controller
 {
+    // Day mapping for delivery times
+    private $days = [
+        1 => 'Saturday',
+        2 => 'Sunday',
+        3 => 'Monday',
+        4 => 'Tuesday',
+        5 => 'Wednesday',
+        6 => 'Thursday',
+        7 => 'Friday'
+    ];
+
     public function setTime(){
-        $time = DeliveryTime::select('group_id')->groupBy('group_id')->get();
+        $time = DeliveryTime::select('group_id')
+                           ->groupBy('group_id')
+                           ->orderBy('group_id')
+                           ->get();
         return view('admin.set_time.index',compact('time'));
     }
     
     public function setTimeStore(Request $request){
-        // dd($request->all());
+        $request->validate([
+            'time' => 'required|array|min:1',
+            'time.*' => 'required|string|max:20',
+            'group_id' => 'required|integer|between:1,7'
+        ]);
+
         try {
+            DB::beginTransaction();
+            
             $f_count = count($request->time);
 
             for ($i = 0; $i < $f_count; $i++) {
@@ -26,21 +47,95 @@ class TimeSetController extends Controller
                 $delivery_time->group_id = $request->group_id;
                 $delivery_time->save();
             }
+            
             DB::commit();
-            return back()->with('success','set time created successfully');
+            $dayName = $this->days[$request->group_id] ?? 'Unknown';
+            return back()->with('success', 'Delivery times created successfully for ' . $dayName);
         } catch (\Throwable $th) {
             DB::rollBack();
-            Session::flash('faild', 'Set Time create faild');
+            Session::flash('failed', 'Failed to create delivery times: ' . $th->getMessage());
             return back();
         }
     }
 
     public function destroy($id){
-        $time = DeliveryTime::select('group_id')->groupBy('group_id')->where('group_id',$id)->delete();
+        try {
+            $time = DeliveryTime::where('group_id', $id)->delete();
+            $dayName = $this->days[$id] ?? 'Unknown';
+            return back()->with('success', 'Delivery times deleted successfully for ' . $dayName);
+        } catch (\Exception $e) {
+            return back()->with('failed', 'Failed to delete delivery times');
+        }
     }
 
     public function show($id){
-        $time = DeliveryTime::where('group_id',$id)->get();
-       return view('admin.set_time.show',compact('time'));
+        $time = DeliveryTime::where('group_id', $id)
+                           ->orderBy('time')
+                           ->get();
+        $dayName = $this->days[$id] ?? 'Unknown';
+        return view('admin.set_time.show', compact('time', 'dayName', 'id'));
+    }
+
+    public function toggleStatus($id)
+    {
+        try {
+            $deliveryTime = DeliveryTime::findOrFail($id);
+            $deliveryTime->is_active = !$deliveryTime->is_active;
+            $deliveryTime->save();
+            
+            $status = $deliveryTime->is_active ? 'enabled' : 'disabled';
+            return response()->json([
+                'success' => true,
+                'message' => "Delivery time {$status} successfully",
+                'is_active' => $deliveryTime->is_active
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update status'
+            ], 500);
+        }
+    }
+
+    public function updateTime(Request $request, $id)
+    {
+        $request->validate([
+            'time' => 'required|string|max:20'
+        ]);
+
+        try {
+            $deliveryTime = DeliveryTime::findOrFail($id);
+            $deliveryTime->time = $request->time;
+            $deliveryTime->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Delivery time updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update delivery time'
+            ], 500);
+        }
+    }
+
+    public function getDeliveryTimes()
+    {
+        try {
+            $times = DeliveryTime::orderBy('group_id')
+                                ->orderBy('time')
+                                ->get()
+                                ->groupBy('group_id');
+            return response()->json([
+                'success' => true,
+                'data' => $times
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch delivery times'
+            ], 500);
+        }
     }
 }
