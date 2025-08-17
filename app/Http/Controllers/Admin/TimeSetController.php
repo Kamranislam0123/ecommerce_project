@@ -33,18 +33,29 @@ class TimeSetController extends Controller
         $request->validate([
             'time' => 'required|array|min:1',
             'time.*' => 'required|string|max:20',
+            'time_end' => 'required|array|min:1',
+            'time_end.*' => 'required|string|max:20',
             'group_id' => 'required|integer|between:1,7'
         ]);
 
         try {
             DB::beginTransaction();
             
+            // Delete existing times for this day to avoid duplicates
+            DeliveryTime::where('group_id', $request->group_id)->delete();
+            
             $f_count = count($request->time);
 
             for ($i = 0; $i < $f_count; $i++) {
+                // Validate time range
+                if ($request->time[$i] >= $request->time_end[$i]) {
+                    throw new \Exception('End time must be after start time for time slot ' . ($i + 1));
+                }
+                
                 $delivery_time = new DeliveryTime();
-                $delivery_time->time = $request->time[$i];
+                $delivery_time->time = $request->time[$i] . ' - ' . $request->time_end[$i];
                 $delivery_time->group_id = $request->group_id;
+                $delivery_time->is_active = true;
                 $delivery_time->save();
             }
             
