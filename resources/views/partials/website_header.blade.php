@@ -1,4 +1,31 @@
 <header id="header" style=" background: #3321c8 !important;">
+<style>
+    .customer-logged-in .ac {
+        background: rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+    }
+    .customer-logged-in .ac:hover {
+        background: rgba(0,0,0,0.2);
+    }
+    .customer-logged-in .ac-content h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .customer-logged-in .ac-content p {
+        margin: 2px 0 0 0;
+        font-size: 12px;
+    }
+    .customer-logged-in .ac-content a:hover {
+        color: #ff6b35 !important;
+        text-decoration: underline !important;
+    }
+    .user-icon-logged {
+        color: #ff6b35 !important;
+    }
+</style>
         <div class="top">
             <div class="container">
                 <div class="ht-item logo" style=" background: #3321c8;">
@@ -52,33 +79,47 @@
                             <p>Offers</p>
                         </div>
                     </a>
-                    <div class="ac">
-                        <a class="ic" href="{{ route('customer.login') }}"><i class="fa-solid fa-user" style="font-size: 20px;"></i></a>
-                        <div class="ac-content">
-                            <a href="{{ route('customer.login') }}">
-                                <h4>Account</h4>
-                            </a>
-                            <p>
-                                <a href="{{ route('customer.signup') }} ">Register</a>
-                                or
-                                <a href="{{route('customer.login')}}">Login</a>
-                            </p>
-                        </div>
+                    <div class="ac {{ Auth::guard('customer')->check() ? 'customer-logged-in' : '' }}">
+                        @if(Auth::guard('customer')->check())
+                            <a class="ic" href="{{ route('customer.panel') }}"><i class="fa-solid fa-user user-icon-logged" style="font-size: 20px;"></i></a>
+                            <div class="ac-content">
+                                <a href="{{ route('customer.panel') }}">
+                                    <h4 style="color: white;">{{ Auth::guard('customer')->user()->name }}</h4>
+                                </a>
+                                <p style="color: #ccc;">
+                                    <a href="{{ route('customer.panel') }}" style="color: #ccc; text-decoration: none;">Profile</a>
+                                    or
+                                    <a href="{{ route('customerLogout') }}" style="color: #ccc; text-decoration: none;" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
+                                </p>
+                            </div>
+                        @else
+                            <a class="ic" href="{{ route('customer.login') }}"><i class="fa-solid fa-user" style="font-size: 20px;"></i></a>
+                            <div class="ac-content">
+                                <a href="{{ route('customer.login') }}">
+                                    <h4>Account</h4>
+                                </a>
+                                <p>
+                                    <a href="{{ route('customer.signup') }} ">Register</a>
+                                    or
+                                    <a href="{{route('customer.login')}}">Login</a>
+                                </p>
+                            </div>
+                        @endif
                     </div>
                     <div class="ac" id="shopping_card">
-                        <a class="ic" href="cart.html">
+                        <a class="ic" href="{{ route('cart.list') }}">
                             <i class="fa-solid fa-cart-shopping" style="font-size: 20px;"></i>
                         </a>
                         <div class="ac-content">
-                            <a href="">
+                            <a href="{{ route('cart.list') }}">
                                 <h5>
                                     Cart
                                     <span class="cart-count bg-light text-dark rounded-pill p-1">
-                                        0
+                                        {{ \Cart::getTotalQuantity() }}
                                     </span>
                                 </h5>
                             </a>
-                            <p><a href="cart.html">Cart Page </a> </p>
+                            <p><a href="{{ route('cart.list') }}">Cart Page </a> </p>
                         </div>
                     </div>
                 </div>
