@@ -449,7 +449,11 @@ class ApiController extends Controller
         
                 $offer_product = Product::where('is_offer','1')->get()->pluck('id')->toArray();
                 // dd($offer_product);
-                $exist_order_tables = OrderDetails::where('customer_id', $request->customer_id)->get()->pluck('product_id')->toArray();
+                $exist_order_tables = OrderDetails::join('orders', 'order_details.order_id', '=', 'orders.id')
+                        ->where('orders.customer_id', $request->customer_id)
+                        ->get()
+                        ->pluck('product_id')
+                        ->toArray();
               
                 // \Cart::getContent()
                 $cart = json_decode($request->cart);
@@ -462,7 +466,6 @@ class ApiController extends Controller
                             $price = $value->price* $value->quantity;
                             $orderDetails = new OrderDetails();
                             $orderDetails->order_id = $order->id;
-                            $orderDetails->customer_id = $order->customer_id;
                             $orderDetails->product_id = $value->id;
                             $orderDetails->product_name = $value->name;
                             $orderDetails->price =$value->price;
@@ -494,7 +497,6 @@ class ApiController extends Controller
                                  $orderDetails->order_id = $order->id;
                                  $orderDetails->product_id = $value->id;
                                  $orderDetails->product_name = $value->name;
-                                 $orderDetails->customer_id = $order->customer_id;
                                  $orderDetails->price =$value->price;
                                  $orderDetails->quantity = $value->quantity;
                                  $orderDetails->total_price = $price;
@@ -518,7 +520,6 @@ class ApiController extends Controller
                                 $orderDetails->order_id = $order->id;
                                 $orderDetails->product_id = $value->id;
                                 $orderDetails->product_name = $value->name;
-                                $orderDetails->customer_id = $order->customer_id;
                                 $orderDetails->price =$value->price;
                                 $orderDetails->quantity = $value->quantity;
                                 $orderDetails->total_price = $price;
@@ -540,7 +541,6 @@ class ApiController extends Controller
                     $orderDetails->order_id = $order->id;
                     $orderDetails->product_id = $value->id;
                     $orderDetails->product_name = $value->name;
-                    $orderDetails->customer_id = $order->customer_id;
                     $orderDetails->price =$value->price;
                     $orderDetails->quantity = $value->quantity;
                     $price = $value->quantity * $value->price;
