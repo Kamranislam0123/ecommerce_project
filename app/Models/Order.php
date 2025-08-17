@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Order extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $fillable  = ['customer_id','invoice_no','customer_name','customer_mobile','customer_email','shipping_address','billing_address','vat_amount','shipping_cost','total_amount','updated_by','status'];
+    protected $fillable  = ['customer_id','invoice_no','customer_name','customer_mobile','customer_email','shipping_address','billing_address','vat_amount','shipping_cost','total_amount','updated_by','status','area_id','order_note','delivery_date','thana_id','time_id','ip_address'];
 
     // customer relationship
     public function customer(){
