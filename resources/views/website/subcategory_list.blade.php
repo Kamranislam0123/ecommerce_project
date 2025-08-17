@@ -19,6 +19,7 @@
     <div class="container">
         <div class="feature-h3 ">
             <h3>{{$Categorylist->name}}</h3>
+            
         </div>
         <div class="row py-3">
             @foreach ($Categorylist->SubCategory as $item)
