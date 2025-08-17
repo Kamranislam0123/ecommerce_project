@@ -44,6 +44,8 @@
                                         <div class="w-100 my-1" >
                                             <div class="input-group input-group-sm">
                                                 <input type="time" name="time[]" class="form-control time-picker" step="900" required>
+                                                <span class="input-group-text">to</span>
+                                                <input type="time" name="time_end[]" class="form-control time-picker-end" step="900" required>
                                                 <div class="input-group-append" onclick="add()">
                                                     <a href="javascript:void(0)" class="border rounded my-select  py-0 px-2"><i
                                                             class="fas fa-plus plus"></i></a>
@@ -165,6 +167,8 @@
     data = data + '<div class="w-100 my-1 add-remove-part">';
     data = data + '<div class="input-group input-group-sm">';
     data = data + '<input type="time" name="time[]" class="form-control time-picker" step="900" required>';
+    data = data + '<span class="input-group-text">to</span>';
+    data = data + '<input type="time" name="time_end[]" class="form-control time-picker-end" step="900" required>';
     data = data + '<div class="input-group-append remove-part"><a class="border btn rounded my-select  py-0 px-2"><i class="fas fa-minus minus"></i></a> </div>';
     data = data + '</div></div>';
 
@@ -183,23 +187,51 @@
     function initializeTimePickers() {
         $('.time-picker').each(function() {
             $(this).on('change', function() {
-                var timeValue = $(this).val();
-                if (timeValue) {
-                    // Convert 24-hour format to 12-hour format for display
-                    var time = new Date('2000-01-01T' + timeValue);
-                    var hours = time.getHours();
-                    var minutes = time.getMinutes();
-                    var ampm = hours >= 12 ? 'PM' : 'AM';
-                    hours = hours % 12;
-                    hours = hours ? hours : 12; // the hour '0' should be '12'
-                    minutes = minutes < 10 ? '0' + minutes : minutes;
-                    var timeString = hours + ':' + minutes + ' ' + ampm;
-                    
-                    // Show preview of selected time
-                    $(this).attr('title', 'Selected: ' + timeString);
-                }
+                validateTimeRange($(this));
             });
         });
+        
+        $('.time-picker-end').each(function() {
+            $(this).on('change', function() {
+                validateTimeRange($(this));
+            });
+        });
+    }
+    
+    // Validate time range
+    function validateTimeRange(element) {
+        var container = element.closest('.input-group');
+        var startTime = container.find('.time-picker').val();
+        var endTime = container.find('.time-picker-end').val();
+        
+        if (startTime && endTime) {
+            if (startTime >= endTime) {
+                container.find('.time-picker-end').addClass('is-invalid');
+                container.find('.time-picker-end').attr('title', 'End time must be after start time');
+            } else {
+                container.find('.time-picker-end').removeClass('is-invalid');
+                container.find('.time-picker-end').attr('title', '');
+                
+                // Format for display
+                var startFormatted = formatTime12h(startTime);
+                var endFormatted = formatTime12h(endTime);
+                container.attr('title', 'Time range: ' + startFormatted + ' - ' + endFormatted);
+            }
+        }
+    }
+    
+    // Format time to 12-hour format
+    function formatTime12h(timeString) {
+        if (!timeString) return '';
+        
+        var time = new Date('2000-01-01T' + timeString);
+        var hours = time.getHours();
+        var minutes = time.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return hours + ':' + minutes + ' ' + ampm;
     }
 
     // Initialize on page load
