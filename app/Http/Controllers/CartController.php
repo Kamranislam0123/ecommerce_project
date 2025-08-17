@@ -42,27 +42,47 @@ class CartController extends Controller
     {
        $product = Product::where('id', $id)->first();
        
+       if (!$product) {
+           return response()->json(['error' => 'Product not found'], 404);
+       }
+       
        $total_item = \Cart::getContent()->count();
-       if($total_item <100){
+       if($total_item < 100){
         
         try {
-            \Cart::add([
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => 1,
-                'attributes' => array(
-                    'image' => $product->image,
-                    'slug' => $product->slug,
-                )
-            ]);
+            // Check if product already exists in cart
+            $existingItem = \Cart::get($product->id);
+            if ($existingItem) {
+                // Update quantity if product already exists
+                \Cart::update($product->id, [
+                    'quantity' => [
+                        'relative' => true,
+                        'value' => 1
+                    ]
+                ]);
+            } else {
+                // Add new product to cart
+                \Cart::add([
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => 1,
+                    'attributes' => array(
+                        'image' => $product->image,
+                        'slug' => $product->slug,
+                    )
+                ]);
+            }
+            
             return response()->json(['success' => 'Cart added successfully']);
           
         } catch (\Throwable $th) {
-            
+            \Log::error('Cart add error: ' . $th->getMessage());
+            return response()->json(['error' => 'Error adding to cart: ' . $th->getMessage()], 500);
         }
+       } else {
+           return response()->json(['error' => 'Cart limit reached (max 100 items)'], 400);
        }
-    //    
     }
 
     public function addToCartAjaxUpdate(Request $request,$id)
@@ -184,67 +204,114 @@ class CartController extends Controller
     }
     public function cartContent(){
         $cart['total_amount'] = \Cart::getTotal();
-        $cart['total_item'] = \Cart::getContent()->count();
+        $cart['total_item'] = \Cart::getTotalQuantity();
         
         return response()->json($cart);
     }
 
+    public function testCart()
+    {
+        try {
+            // Test basic cart functionality
+            $cart = \Cart::getContent();
+            $total = \Cart::getTotal();
+            $count = \Cart::getContent()->count();
+            
+            // Test adding a sample item
+            \Cart::add([
+                'id' => 'test-123',
+                'name' => 'Test Product',
+                'price' => 100,
+                'quantity' => 1,
+                'attributes' => array(
+                    'image' => 'test.jpg',
+                    'slug' => 'test-product',
+                )
+            ]);
+            
+            $newCount = \Cart::getContent()->count();
+            
+            return response()->json([
+                'success' => true,
+                'cart_count' => $count,
+                'cart_total' => $total,
+                'cart_items' => $cart->toArray(),
+                'test_added' => $newCount > $count,
+                'new_count' => $newCount
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ], 500);
+        }
+    }
+
    public function decrement($id){
         $product = Product::where('id',$id)->first();
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+        
         foreach(\Cart::getContent() as $item){
-            if($item->quantity == 1){
-                $cart = 'data updated successfully';
-            }
-            else{
-                 if($item->id == $product->id){
-                    
-                \Cart::update(
-                    $item->id,
-                    [
-                        'quantity' => [
-                            'relative' => false,
-                            'value' => $item->quantity -1
-                        ],
-                    ]
+            if($item->id == $product->id){
+                if($item->quantity == 1){
+                    // Don't decrement below 1
+                    return response()->json(['error' => 'Quantity cannot be less than 1']);
+                }
+                else{
+                    \Cart::update(
+                        $item->id,
+                        [
+                            'quantity' => [
+                                'relative' => false,
+                                'value' => $item->quantity - 1
+                            ],
+                        ]
                     );
+                    return response()->json(['success' => 'Quantity decreased successfully']);
                 }
             } 
         }
        
-        $cart = 'data updated successfully';
-        return response()->json($cart);
+        return response()->json(['error' => 'Item not found in cart'], 404);
     }
+    
      public function increment($id){
         $product = Product::with('inventory')->where('id',$id)->first();
-         $stock = $product->inventory->purchage;
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+        
+        $stock = $product->inventory->purchage;
 
         foreach(\Cart::getContent() as $item){
             if($item->id == $product->id){
-                if($item->quantity+1 > 100){
-                    return response()->json(['error' => 'Maximum order quanity 100']);
+                if($item->quantity + 1 > 100){
+                    return response()->json(['error' => 'Maximum order quantity 100']);
                 }
                 else{
                     if($item->quantity + 1 <= $stock){
-                        if($item->id == $product->id){
-                            \Cart::update(
-                                $item->id,
-                                [
-                                    'quantity' => [
-                                        'relative' => false,
-                                        'value' => $item->quantity +1
-                                    ],
-                                ]
-                            ); 
-    
-                        }
+                        \Cart::update(
+                            $item->id,
+                            [
+                                'quantity' => [
+                                    'relative' => false,
+                                    'value' => $item->quantity + 1
+                                ],
+                            ]
+                        );
+                        return response()->json(['success' => 'Quantity increased successfully']);
                     }
                     else{
-                        return response()->json(['error' => 'Stock have no available.']);
+                        return response()->json(['error' => 'Stock not available']);
                     }
                 }
             }   
         }
-            
+        
+        return response()->json(['error' => 'Item not found in cart'], 404);
     }
     
     
