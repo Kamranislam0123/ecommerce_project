@@ -389,17 +389,37 @@
 
 
                         <div class="product-price-options" style="margin-top: 10px">
+                            @php
+                                $discount = $product->discount;
+                                // Calculate the new price after discount
+                                if ($discount > 0) {
+                                    $new_price = $product->price - ($product->price * $discount / 100);
+                                    $new_price = max(0, $new_price); // Ensure it doesn't go below 0
+                                    $original_price = $product->price; // This is the original price before discount
+                                } else {
+                                    $new_price = $product->price; // No discount, so new price = original price
+                                    $original_price = $product->price;
+                                }
+                            @endphp
 
-                            <span class="price">
-                                <h2 class="price-new bd_currency">
-                                    {{ $product->price }} ৳
-                                </h2>
-                            </span>
-                            <span class="price ms-2">
-                                <h2 class="price-old bd_currency">
-                                    {{ $product->discount }} ৳
-                                </h2>
-                            </span>
+                            @if($discount > 0)
+                                <span class="price">
+                                    <h2 class="price-new bd_currency">
+                                        {{ number_format($new_price) }} ৳
+                                    </h2>
+                                </span>
+                                <span class="price ms-2">
+                                    <h2 class="price-old bd_currency">
+                                        {{ number_format($original_price) }} ৳
+                                    </h2>
+                                </span>
+                            @else
+                                <span class="price">
+                                    <h2 class="price-new bd_currency">
+                                        {{ number_format($new_price) }} ৳
+                                    </h2>
+                                </span>
+                            @endif
                         </div>
 
                         <form action="https://corporatetechbd.com/products/buy/now" method="POST" id="buy-now-form">
