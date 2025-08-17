@@ -1,12 +1,25 @@
 @php
-function formatTime12h($timeString) {
+function formatTimeRange($timeString) {
     if (!$timeString) return '';
     
-    // Convert 24-hour format to 12-hour format
-    $time = DateTime::createFromFormat('H:i', $timeString);
-    if (!$time) return $timeString;
+    // Check if it's a time range (contains '-')
+    if (strpos($timeString, ' - ') !== false) {
+        $times = explode(' - ', $timeString);
+        $startTime = DateTime::createFromFormat('H:i', trim($times[0]));
+        $endTime = DateTime::createFromFormat('H:i', trim($times[1]));
+        
+        if ($startTime && $endTime) {
+            return $startTime->format('g:i A') . ' - ' . $endTime->format('g:i A');
+        }
+    }
     
-    return $time->format('g:i A');
+    // Single time format
+    $time = DateTime::createFromFormat('H:i', $timeString);
+    if ($time) {
+        return $time->format('g:i A');
+    }
+    
+    return $timeString;
 }
 @endphp
 @extends('layouts.admin')
@@ -50,7 +63,7 @@ function formatTime12h($timeString) {
                                                 <input type="time" class="form-control time-edit" data-id="{{$item->id}}" value="{{$item->time}}" style="display: none;" step="900">
                                             </td>
                                             <td>
-                                                <span class="time-12h">{{formatTime12h($item->time)}}</span>
+                                                <span class="time-12h">{{formatTimeRange($item->time)}}</span>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
@@ -159,6 +172,21 @@ $(document).ready(function() {
         setTimeout(function() {
             notification.alert('close');
         }, 3000);
+    }
+    
+    function formatTimeRange(timeString) {
+        if (!timeString) return '';
+        
+        // Check if it's a time range (contains '-')
+        if (timeString.includes(' - ')) {
+            var times = timeString.split(' - ');
+            var startTime = formatTime12h(times[0].trim());
+            var endTime = formatTime12h(times[1].trim());
+            return startTime + ' - ' + endTime;
+        }
+        
+        // Single time format
+        return formatTime12h(timeString);
     }
     
     function formatTime12h(timeString) {
