@@ -304,7 +304,7 @@ input {
     <div class="progressbar">
         <div class="progress" id="progress"></div>
         <div class="progress-step progress-step-active" data-title="Account"></div>
-        <div class="progress-step" data-title="Delivery Date"></div>
+        <div class="progress-step" data-title="Order Date"></div>
         <div class="progress-step" data-title="Order Summery"></div>
     </div>
     <div class="step-forms step-forms-active">
@@ -362,18 +362,22 @@ input {
         $now = new DateTime();
         $date = $now->format('d-m-Y /l');
         ?>
-        <div class="group-inputs"> <label for="position">Delivery Date<span class="text-danger">*</span></label>  
-            <input type="text" value="{{$date}}" name="delivery_date" id="date" onchange="datechange()"  autocomplete="off" class="form-control " placeholder="Delivery Date *" required>
-
+        <div class="group-inputs"> 
+            <label for="position">Order Date<span class="text-danger">*</span></label>  
+            <input type="text" value="{{$date}}" name="delivery_date" id="date" autocomplete="off" class="form-control" placeholder="Order Date *" required>
+            <small class="text-muted">Select your preferred order date</small>
         </div>
 
-                 <div class="group-inputs"> 
-             <label for="time_id">Select Time<span class="text-danger">*</span></label>  
-             <select name="time_id" id="time_id" class="form-control" required disabled>
-                 <option value="">Please select a date first</option>
-             </select>
-             <small class="text-muted" id="time-help">Available delivery times will appear after selecting a date</small>
-         </div>
+        <!-- Hidden time field with default value -->
+        <input type="hidden" name="time_id" value="4">
+        
+        <!-- <div class="group-inputs"> 
+            <label for="time_id">Select Time<span class="text-danger">*</span></label>  
+            <select name="time_id" id="time_id" class="form-control" required disabled>
+                <option value="">Please select a date first</option>
+            </select>
+            <small class="text-muted" id="time-help">Available order times will appear after selecting a date</small>
+        </div> -->
         
 
         <div class="btns-group"> <a href="#" class="my-btn btn-prev">Previous</a> <a href="#" class="my-btn btn-next" onclick="secondStep()">Next</a> </div>
@@ -495,10 +499,10 @@ input {
   </script>
   <script>
        function secondStep(){
-          var time = $('#time_id').val();
           var date = $('#date').val();
-          if(time == '' || date == ''){
-            alert('Requied fill must be fill-up');
+          if(date == ''){
+            alert('Please select an order date');
+            return false;
           }
       }
   </script>
@@ -547,64 +551,67 @@ input {
  <script>
 
     $(function() {
-     var date = new Date();
-     var dayNo = date.getDay();
-     var mindate = (7 - dayNo);
-     var d = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ];
-    //  $('#date').datepicker({
-    //             dateFormat: 'dd-mm-yy /DD', });
-    // $('#date').datepicker('setDate', new Date());
-     $("#date").datepicker({
-        showOtherMonths: true,
-        selectOtherMonths: true,
-        changeMonth: true,
-        changeYear: true,
-        showButtonPanel: true,
-        minDate: 0,
-        dateFormat: 'dd-mm-yy /DD',
-                 onSelect: function(dateText, inst) {
-          var today = new Date(dateText);
-          var day = d[today.getDay()];
-          console.log('Selected day:', day);
-          var input_day = $('#date').val();
-          var day_pass = $(this).datepicker('getDate').toString();
-          var day_pass = day_pass.substring(0, 3);
-          console.log('Day pass:', day_pass);
-          
-          // Show loading state
-          $('#time_id').html('<option value="">Loading available times...</option>').prop('disabled', true);
-          $('#time-help').text('Loading available delivery times...');
-          
-          $.ajax({
-                url:"{{route('time.show')}}",
-                type:"get",
-                data:{"day_pass" : day_pass},
-                dataType: "json",
-                success:function(res){
-                    console.log('Available times:', res);
-                    if(res && res.length > 0) {
-                        var html = '<option value="">Select Delivery Time</option>';
-                        $.each(res,function(key,v){
-                            // Format time for better display
-                            var timeDisplay = formatTimeForDisplay(v.time);
-                            html += '<option value="'+v.id+'">'+timeDisplay+'</option>';
-                        });
-                        $("#time_id").html(html).prop('disabled', false);
-                        $('#time-help').text('Select your preferred delivery time for ' + day);
-                    } else {
-                        $("#time_id").html('<option value="">No delivery times available</option>').prop('disabled', true);
-                        $('#time-help').text('No delivery times available for this date. Please select another date.');
+        var date = new Date();
+        var dayNo = date.getDay();
+        var mindate = (7 - dayNo);
+        var d = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ];
+        
+        $("#date").datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            minDate: 0,
+            dateFormat: 'dd-mm-yy /DD',
+            beforeShowDay: function(date) {
+                // Disable past dates
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return [date >= today, ''];
+            },
+            onSelect: function(dateText, inst) {
+                var selectedDate = new Date(dateText);
+                var day = d[selectedDate.getDay()];
+                console.log('Selected day:', day);
+                
+                var day_pass = $(this).datepicker('getDate').toString();
+                day_pass = day_pass.substring(0, 3);
+                console.log('Day pass:', day_pass);
+                
+                // Show loading state
+                $('#time_id').html('<option value="">Loading available times...</option>').prop('disabled', true);
+                $('#time-help').text('Loading available order times for ' + day + '...');
+                
+                $.ajax({
+                    url:"{{route('time.show')}}",
+                    type:"get",
+                    data:{"day_pass" : day_pass},
+                    dataType: "json",
+                    success:function(res){
+                        console.log('Available times:', res);
+                        if(res && res.length > 0) {
+                            var html = '<option value="">Select Order Time</option>';
+                            $.each(res,function(key,v){
+                                // Format time for better display
+                                var timeDisplay = formatTimeForDisplay(v.time);
+                                html += '<option value="'+v.id+'">'+timeDisplay+'</option>';
+                            });
+                            $("#time_id").html(html).prop('disabled', false);
+                            $('#time-help').text('Select your preferred order time for ' + day);
+                        } else {
+                            $("#time_id").html('<option value="">No order times available</option>').prop('disabled', true);
+                            $('#time-help').text('No order times available for ' + day + '. Please select another date.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching times:', error);
+                        $("#time_id").html('<option value="">Error loading times</option>').prop('disabled', true);
+                        $('#time-help').text('Error loading order times. Please try again.');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching times:', error);
-                    $("#time_id").html('<option value="">Error loading times</option>').prop('disabled', true);
-                    $('#time-help').text('Error loading delivery times. Please try again.');
-                }
-           })
-        }
-   
-     });
+                });
+            }
+        });
     
     // Function to format time for display (convert 24h to 12h format)
     function formatTimeForDisplay(timeString) {
@@ -614,6 +621,22 @@ input {
         if (timeString.includes('AM') || timeString.includes('PM')) {
             return timeString;
         }
+        
+        // Check if it's a time range (contains '-')
+        if (timeString.includes(' - ')) {
+            var times = timeString.split(' - ');
+            var startTime = formatSingleTime(times[0].trim());
+            var endTime = formatSingleTime(times[1].trim());
+            return startTime + ' - ' + endTime;
+        }
+        
+        // Single time format
+        return formatSingleTime(timeString);
+    }
+    
+    // Function to format single time
+    function formatSingleTime(timeString) {
+        if (!timeString) return '';
         
         // Convert 24-hour format to 12-hour format
         var time = new Date('2000-01-01T' + timeString);
@@ -631,9 +654,9 @@ input {
         var selectedTime = $(this).find('option:selected').text();
         var selectedDate = $('#date').val();
         
-        if(selectedTime && selectedTime !== 'Select Delivery Time' && selectedTime !== 'Loading available times...' && selectedTime !== 'No delivery times available' && selectedTime !== 'Error loading times') {
+        if(selectedTime && selectedTime !== 'Select Order Time' && selectedTime !== 'Loading available times...' && selectedTime !== 'No order times available' && selectedTime !== 'Error loading times') {
             // Show success message
-            showTimeSelectionMessage('Delivery time selected: ' + selectedTime);
+            showTimeSelectionMessage('Order time selected: ' + selectedTime);
         }
     });
     
