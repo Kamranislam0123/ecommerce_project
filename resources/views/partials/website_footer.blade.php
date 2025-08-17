@@ -58,7 +58,7 @@
                 <div class="footer-block org-info footer_res">
                     <h4>Stay Connected</h4>
                     <p>
-                        <b class="store-name">Corporate Technology's.</b>
+                        <b class="store-name">Datascape It's.</b>
                         <br />
                         55/B, Purana Polton, Noakhali tower, Level 3 &amp; 9, Dhaka -1000
                     </p>
@@ -119,10 +119,10 @@
             </div>
             <div class="row sub-footer">
                 <div class="col-md-4 copyright-info">
-                    <p>© 2025 Corporate Technology's. | All rights reserved</p>
+                    <p>© 2025 Datascape It's. | All rights reserved</p>
                 </div>
                 <div class="col-md-7 powered-by">
-                    <p>Developed By: <a class="text-white" href="index.html"> Acquaint Technologies </a></p>
+                    <p>Developed By: <a class="text-white" href="index.html"> DataScape-IT-Limited </a></p>
                 </div>
                 <div class="col-1"></div>
             </div>
