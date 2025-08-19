@@ -23,7 +23,7 @@
                         <div class="offer-card">
                             <div class="offer-image">
                                 @if($offer->image)
-                                    <img src="{{ asset('uploads/offers/' . $offer->image) }}" alt="{{ $offer->title }}" class="img-fluid">
+                                    <img src="{{ asset($offer->image) }}" alt="{{ $offer->title }}" class="img-fluid">
                                 @else
                                     <div class="offer-placeholder">
                                         <i class="fas fa-gift"></i>
