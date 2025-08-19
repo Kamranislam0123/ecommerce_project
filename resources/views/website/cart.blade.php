@@ -545,7 +545,11 @@ window.removeFromCart = function(productId) {
     if (confirm('Are you sure you want to remove this item from cart?')) {
         $j.ajax({
             url: '/remove/' + productId,
-            type: 'GET',
+            type: 'POST',
+            data: {
+                id: productId,
+                _token: '{{ csrf_token() }}'
+            },
             success: function(response) {
                 if (response.success) {
                     // Remove the row from the table
