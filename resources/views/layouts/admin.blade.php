@@ -17,6 +17,32 @@
         <link href="{{ asset('admin/css/styles.css') }}" rel="stylesheet" />
         <link href="{{ asset('admin/css/custom.css') }}" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="{{asset('admin/css/invoice.css')}}">
+        <style>
+            /* Simple Sidebar Heading Styles */
+            .sb-sidenav-menu-heading {
+                padding: 0.5rem 1rem;
+                margin: 0.25rem 0;
+                font-weight: 600;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                color: #0056b3 !important;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+            }
+            
+            /* Simple hover effect */
+            .sb-sidenav-menu-nested .nav-link:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Simple active state */
+            .sb-sidenav-menu-nested .nav-link.active {
+                background-color: rgba(255, 255, 255, 0.15);
+                font-weight: 600;
+            }
+        </style>
         @stack('admin-css')
     </head>
     <body class="sb-nav-fixed fixed-footer"  onload="startTime()">
