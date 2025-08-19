@@ -196,25 +196,42 @@ class HomeController extends Controller
     // search
     public function getSearchSuggestions($keyword)
     {
-        $product = Product::select('name')
+        // Limit keyword length for performance
+        $keyword = substr($keyword, 0, 50);
+        
+        // Get product suggestions (only active products)
+        $products = Product::select('name')
+            ->where('status', 'A')
+            ->where(function($query) use ($keyword) {
+                $query->where('name', 'like', "%$keyword%")
+                      ->orWhere('code', 'like', "%$keyword%");
+            })
+            ->limit(5)
+            ->get()
+            ->pluck('name')
+            ->toArray();
+
+        // Get category suggestions
+        $categories = Category::select('name')
             ->where('name', 'like', "%$keyword%")
-            ->get()->toArray();
+            ->limit(3)
+            ->get()
+            ->pluck('name')
+            ->toArray();
 
-        $category = Category::select('name as name')
+        // Get subcategory suggestions
+        $subcategories = SubCategory::select('name')
             ->where('name', 'like', "%$keyword%")
-            ->get()->toArray();
+            ->limit(3)
+            ->get()
+            ->pluck('name')
+            ->toArray();
 
-        $subcategory = SubCategory::select('name as name')
-            ->where('name', 'like', "%$keyword%")
-            ->get()->toArray();
-
-        $mergedArray = array_merge($product, $category, $subcategory);
-
-        $search_results = [];
-
-        foreach ($mergedArray as $sr) {
-            $search_results[] = $sr['name'];
-        }
+        // Merge and remove duplicates
+        $search_results = array_unique(array_merge($products, $categories, $subcategories));
+        
+        // Limit total results
+        $search_results = array_slice($search_results, 0, 8);
 
         return response()->json($search_results);
     }
@@ -222,13 +239,22 @@ class HomeController extends Controller
     public function productSearch()
     {
         if (request()->query('q')) {
+            $keyword = request()->query('q');
+            
+            // Search in products by name, description, and short details
+            $search_result = Product::where(function($query) use ($keyword) {
+                $query->where('name', 'like', "%$keyword%")
+                      ->orWhere('description', 'like', "%$keyword%")
+                      ->orWhere('short_details', 'like', "%$keyword%")
+                      ->orWhere('code', 'like', "%$keyword%");
+            })
+            ->where('status', 'A') // Only active products
+            ->with(['category', 'inventory']) // Eager load relationships
+            ->get();
 
             $categories = Category::all();
             $centerBigAds = Ad::where('status', 'a')->where('position', '4')->take(1)->get();
             $leftAds = Ad::where('status', 'a')->where('position', '1')->latest()->take(1)->get();
-
-            $keyword = request()->query('q');
-            $search_result = Product::Where('name', 'like', "%$keyword%")->get();
 
             return view('website.search', compact('search_result', 'keyword', 'leftAds', 'centerBigAds', 'categories'));
         }
