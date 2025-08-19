@@ -102,7 +102,7 @@ class OrderController extends Controller
         $customer_phone = $customer->customer_mobile;
         $message = "আপনার অর্ডার এখন প্রক্রিয়াকরণ . আপনার চালান নম্বর $order->invoice_no ; $request->message  ";
         $this->send_sms($customer_phone ,$message);
-        return back()->with('success', 'Order Confirm Successfully');
+        return redirect()->route('order.onProcess')->with('success', 'Order Confirm Successfully');
     }
 
     public function offerPending($id){
@@ -113,9 +113,9 @@ class OrderController extends Controller
         $order->save();
         $customer = Order::where('customer_id',$order->customer_id)->first();
         $customer_phone = $customer->customer_mobile;
-        $message = "আপনার অর্ডার এখন প্রক্রিয়াকরণ . আপনার চালান নম্বর $order->invoice_no ; $request->message  ";
+        $message = "আপনার অর্ডার এখন প্রক্রিয়াকরণ . আপনার চালান নম্বর $order->invoice_no";
         $this->send_sms($customer_phone ,$message);
-        return back()->with('success', 'Offer  Pending Successfully');
+        return redirect()->route('order.offer.pending')->with('success', 'Offer  Pending Successfully');
         
     }
     public function offerPending2(Request $request,$id){
@@ -124,7 +124,7 @@ class OrderController extends Controller
         $order->updated_by = Auth::user()->id;
         $order->pending_msg = $request->message;
         $order->save();
-        return back()->with('success', 'Offer  Pending Successfully');
+        return redirect()->route('offer.onProcess')->with('success', 'Offer  Pending Successfully');
         
     }
 
@@ -149,7 +149,7 @@ class OrderController extends Controller
         $customer_phone = $customer->customer_mobile;
         $message = "আপনার  অর্ডারটি পথে আছে। আপনার চালান নম্বর $order->invoice_no. $admin_msg";
         $this->send_sms($customer_phone , $message);
-        return back()->with('success', 'Order On the way');
+        return redirect()->route('order.way')->with('success', 'Order On the way');
     }
      // order prodcess function
      public function process2(Request $request, $id)
@@ -167,9 +167,9 @@ class OrderController extends Controller
          $admin_msg = $request->message;
          $customer = Order::where('customer_id',$order->customer_id)->first();
          $customer_phone = $customer->customer_mobile;
-         $message = "আপনার  অর্ডারটি পথে আছে। আপনার চালান নম্বর $order->invoice_no. $admin_msg";
-         $this->send_sms($customer_phone , $message);
-         return back()->with('success', 'Order On the way');
+                 $message = "আপনার  অর্ডারটি পথে আছে। আপনার চালান নম্বর $order->invoice_no. $admin_msg";
+        $this->send_sms($customer_phone , $message);
+        return redirect()->route('offer.way')->with('success', 'Order On the way');
      }
 
      // order prodcess function
@@ -187,7 +187,7 @@ class OrderController extends Controller
 
 
         $this->send_sms($customer_phone , $message);   
-         return back()->with('success', 'Order Delivery Confirm Successfully');
+         return redirect()->route('waiting.delivered')->with('success', 'Order Delivery Confirm Successfully');
      }
      // order prodcess function
      public function wayProcess2(Request $request,$id)
@@ -207,7 +207,7 @@ class OrderController extends Controller
 
 
         $this->send_sms($customer_phone , $message);   
-         return back()->with('success', 'Order Delivery Confirm Successfully');
+         return redirect()->route('waiting.delivered')->with('success', 'Order Delivery Confirm Successfully');
      }
 
      public function waitingDelivery($id){
@@ -221,7 +221,7 @@ class OrderController extends Controller
 
 
         $this->send_sms($customer_phone , $message);   
-         return back()->with('success', 'Order Delivery Confirm Successfully');
+         return redirect()->route('order.delivary')->with('success', 'Order Delivery Confirm Successfully');
      }
       // order delete function
      public function destroy($id){
@@ -241,7 +241,7 @@ class OrderController extends Controller
         $message = "আপনার অর্ডারটি বাতিল করা হয়েছে, আপনার চালান নম্বর $order->invoice_no ";
         $this->send_sms($customer_phone , $message);  
 
-        return back()->with('success', 'Order cancel successfully');
+        return redirect()->route('cancel.list')->with('success', 'Order cancel successfully');
      }
       // on delivery done 
       public function delivered()
@@ -347,7 +347,7 @@ class OrderController extends Controller
         $customer_phone = $order->customer_mobile;
         $message = " আপনার অনুরোধে আপনার অর্ডারটি পেন্ডিং এ পাঠানো হয়েছে, আপনার চালান নম্বর $order->invoice_no $request->message";
         $this->send_sms($customer_phone , $message);
-        return back()->with('success','successfully cancel to pending list');
+        return redirect()->route('order.index')->with('success','successfully cancel to pending list');
     }
     public function orderProductDelete($id){
         $orderDetails = OrderDetails::where('id',$id)->first();
