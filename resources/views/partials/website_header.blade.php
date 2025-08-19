@@ -205,8 +205,53 @@
          .ht-item.q-actions .ac-content p {
              font-size: 9px;
          }
+          }
+     
+     /* Search Suggestions Styling */
+     .dropdown-menu {
+         border: 1px solid #ddd;
+         border-radius: 8px;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+         background: white;
      }
-</style>
+     
+     .search-suggestions {
+         min-width: 300px;
+     }
+     
+     .suggestion-header {
+         background: #f8f9fa;
+         font-weight: 600;
+         color: #333;
+     }
+     
+     .suggestion-item {
+         cursor: pointer;
+         transition: background-color 0.2s ease;
+     }
+     
+     .suggestion-item:hover {
+         background-color: #f8f9fa;
+     }
+     
+     .suggestion-item:last-child {
+         border-bottom: none !important;
+     }
+     
+     .suggestion-footer {
+         background: #f8f9fa;
+         border-top: 1px solid #dee2e6;
+     }
+     
+     .suggestion-item i {
+         color: #6c757d;
+     }
+     
+     .suggestion-item span {
+         color: #333;
+         font-size: 14px;
+     }
+ </style>
         <div class="top">
             <div class="container">
                 <div class="ht-item logo" style=" background: #3321c8;">
@@ -228,26 +273,18 @@
                     <button><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
                 <div class="ht-item search">
-                    <form action="https://www.corporatetechbd.com/user/product_search" method="post">
-                        <input name="_token" type="hidden" value="JPAIb4wFXe1rJXoeQXlWPPRZ3HCP6slxOTiUaoyg" /> <input
-                            id="searching_product_data" name="search" placeholder="Search" required=""
-                            style="border: 1px solid #ccc;" type="search" value="" />
+                    <form action="{{ route('search') }}" method="GET">
+                        <input
+                            id="searching_product_data" name="q" placeholder="Search" required=""
+                            style="border: 1px solid #ccc;" type="search" value="{{ request('q') }}" />
                         <button type="submit">
                             <i class="fa-solid fa-magnifying-glass" style="padding: 2px; padding-bottom: 3px;"></i>
                         </button>
-                        <div class="dropdown-menu" id="dropdown-menu1" style="top: 47px; left: 0px; display: none;">
-                            <div class="search-details">
-                                <ul class="nav nav-tabs">
-                                    <li class="active" id="suggession-product-nav">
-                                        Products
-                                    </li>
-                                    <li id="suggession-cat-nav">
-                                        Categories
-                                    </li>
-                                </ul>
-                                <div id="search_product_details"></div>
-                            </div>
-                        </div>
+                                                 <div class="dropdown-menu" id="dropdown-menu1" style="top: 47px; left: 0px; display: none; width: 100%; max-height: 400px; overflow-y: auto;">
+                             <div class="search-details">
+                                 <div id="search_product_details"></div>
+                             </div>
+                         </div>
                     </form>
                 </div>
                 <div class="ht-item q-actions">
