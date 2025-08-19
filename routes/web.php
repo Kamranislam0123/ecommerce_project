@@ -66,6 +66,7 @@ Route::get('/allproduct',[HomeController::class,'allProduct'])->name('all.produc
 // Offer routes
 Route::get('/offers', [App\Http\Controllers\OfferController::class, 'index'])->name('offers');
 Route::get('/offers/{id}', [App\Http\Controllers\OfferController::class, 'show'])->name('offer.details');
+Route::get('/debug-offer/{id}', [App\Http\Controllers\OfferController::class, 'debug'])->name('offer.debug');
 
 // company profile route
 
@@ -110,18 +111,21 @@ Route::post('/forget/password/reset/change', [CustomerCustomerController::class,
 
 // customer invoice
 Route::get('/invoice-customer/{id}', [CustomerCustomerController::class, 'invoice'])->name('invoice.customer');
+Route::get('/invoice-customer/{id}/pdf', [CustomerCustomerController::class, 'downloadPdf'])->name('invoice.customer.pdf');
 
 // cart
 Route::get('/cart', [CartController::class, 'cartList'])->name('cart.list');
 Route::post('cart', [CartController::class, 'addToCart'])->name('cart.store');
-Route::get('/cart-add/{id}', [CartController::class, 'addToCartAjax'])->name('cart.store.ajax');
+Route::post('/cart-add/{id}', [CartController::class, 'addToCartAjax'])->name('cart.store.ajax');
+Route::get('/test-cart', [CartController::class, 'testCart'])->name('cart.test');
 Route::get('/cart-add/update/{id}', [CartController::class, 'addToCartAjaxUpdate'])->name('cart.increment.ajax.update');
 Route::post('/cart-buy', [CartController::class, 'buyToCart'])->name('cart.buy');
+Route::post('/products/buy/now', [CartController::class, 'buyNow'])->name('products.buy.now');
 Route::post('/update-cart', [CartController::class, 'updateCart'])->name('cart.update');
 Route::post('/remove', [CartController::class, 'removeCart'])->name('cart.remove');
 Route::post('/clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
 
-Route::get('/remove/{id}', [CartController::class, 'removeCartAjax'])->name('cart.remove.ajax');
+Route::post('/remove/{id}', [CartController::class, 'removeCartAjax'])->name('cart.remove.ajax');
 Route::get('/cart-all', [CartController::class, 'cartAllData'])->name('cart.alldata');
 Route::get('/cart-content', [CartController::class, 'cartContent'])->name('cart.content');
 Route::get('/test-cart', [CartController::class, 'testCart'])->name('cart.test');
@@ -406,6 +410,40 @@ Route::get('/delivery-times',[TimeSetController::class,'getDeliveryTimes'])->nam
         Route::get('/feedback',[PublicMessageController::class,'index'])->name('public.sms')->middleware('check');
 
 });
+
+// Debug route for sidebar testing (remove in production)
+Route::get('/debug-sidebar', function () {
+    if (!Auth::check()) {
+        return 'Not authenticated';
+    }
+    
+    $user = Auth::user();
+    $permissions = \App\Models\Permission::with('page')->where('user_id', $user->id)->get();
+    
+    echo "<h2>Debug Information for User: {$user->email}</h2>";
+    echo "<p>User ID: {$user->id}</p>";
+    echo "<p>Total Permissions: {$permissions->count()}</p>";
+    
+    echo "<h3>Permissions:</h3>";
+    foreach ($permissions as $permission) {
+        if ($permission->page) {
+            echo "<p>✓ Permission ID: {$permission->id} - Page: {$permission->page->name} (Status: {$permission->page->status})</p>";
+        } else {
+            echo "<p>✗ Permission ID: {$permission->id} - Page: NULL (orphaned)</p>";
+        }
+    }
+    
+    echo "<h3>All Pages:</h3>";
+    $pages = \App\Models\Page::all();
+    foreach ($pages as $page) {
+        echo "<p>Page ID: {$page->id} - Name: {$page->name} - Status: {$page->status}</p>";
+    }
+    
+    echo "<h3>Current Route:</h3>";
+    echo "<p>Route Name: " . (Route::current()->getName() ?? 'null') . "</p>";
+    
+    return '';
+})->middleware('auth');
 
    
 
