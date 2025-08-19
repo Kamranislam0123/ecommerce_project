@@ -225,7 +225,15 @@
                                             </a>
                                         @else
                                             <a class="btn btn-outline-primary add_to_cart_single_qty" href="javascript:void(0);" 
-                                               onclick="addToCard({{$item->id}})" style="width: 50%; margin: 0px; border: none;">
+                                               product-id="{{$item->id}}" 
+                                               product_name="{{$item->name}}"
+                                               product_price="{{$new_price}}"
+                                               product_sku="{{$item->sku ?? ''}}"
+                                               product_color=""
+                                               product_size=""
+                                               qty="1"
+                                               max_order_qty="{{$stock}}"
+                                               style="width: 50%; margin: 0px; border: none;">
                                                 Add to Cart
                                             </a>
                                             <button class="btn btn-secondary" style="width: 50%; border: none;" type="submit">
