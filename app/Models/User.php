@@ -21,6 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'action_process',
+        'action_view',
+        'action_edit',
+        'action_create',
+        'action_delete',
     ];
 
     /**
