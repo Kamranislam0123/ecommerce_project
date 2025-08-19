@@ -100,7 +100,6 @@
         
         // $("#buyNowModal").modal('show');
         $j(".add_to_cart_single_qty").on('click', function (event) {
-            //alert('ok');
             event.preventDefault();
             var product_name = $j(this).attr('product_name');
             var product_price = parseFloat($j(this).attr('product_price'));
@@ -110,29 +109,26 @@
             var id = $j(this).attr('product-id');
             var qty = $j(this).attr('qty');
             var max_order_qty = $j(this).attr('max_order_qty');
+            
             if (parseInt(max_order_qty) < parseInt(qty)) {
                 toastr.error('You can not order more than ' + max_order_qty);
                 return false;
             }
-            var url = 'https://www.corporatetechbd.com/product/add/cart';
+            
+            var url = '{{ route("cart.store.ajax", ":id") }}'.replace(':id', id);
             $j.post(url, {
                 id: id,
                 qty: qty,
                 product_sku: product_sku,
                 selectedColor: product_color,
                 selectedSize: product_size,
-                _token: 'JPAIb4wFXe1rJXoeQXlWPPRZ3HCP6slxOTiUaoyg'
+                _token: $j('meta[name="csrf-token"]').attr('content')
             },
                 function (data, status) {
-                    console.log(data);
-                    if (data.flash_message_error) {
-                        toastr.error('Something went wrong.');
-                    } else {
-                        $j(".buy_now_modal_product_name").text(product_name);
-                        $j(".buy_now_modal_product_qty").text((cart_total_qty + 1));
-                        $j(".buy_now_modal_sub_total").text((cart_sub_total + product_price));
-                        $j(".buy_now_modal_message").hide();
-                        $j("#buyNowModal").modal('show');
+                    console.log('Cart add response:', data);
+                    if (data.success) {
+                        // Show success message
+                        toastr.success('Product added to cart successfully!');
                         
                         // Update cart count in header
                         updateCartCount();
@@ -141,10 +137,16 @@
                         if (window.location.pathname === '/cart') {
                             updateCartTotals();
                         }
+                    } else {
+                        // Show error if the server returns an error response
+                        toastr.error('Error adding product to cart: ' + (data.error || 'Unknown error'));
                     }
                 },
                 'json'
-            );
+            ).fail(function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                toastr.error('Failed to add item to cart. Please try again.');
+            });
         });
         $(".buy_now_modal_close").on('click', function () {
             window.location.reload();
@@ -153,23 +155,22 @@
     <script>
         $j('.remove_from_cart').on('click', function () {
             var id = $j(this).data("id");
-            // alert(id);
-            var url = 'https://www.corporatetechbd.com/website/cart/item/remove';
+            var url = '{{ route("cart.remove.ajax", ":id") }}'.replace(':id', id);
             $j.post(url, {
                 id: id,
-                _token: 'JPAIb4wFXe1rJXoeQXlWPPRZ3HCP6slxOTiUaoyg'
+                _token: $j('meta[name="csrf-token"]').attr('content')
             },
                 function (data, status) {
-                    // console.log('data : ' + data);
-                    // console.log('status : ' + status);
-                    // alert('Data remove successfully.');
                     window.location.reload();
                     
                     // Update cart count in header
                     updateCartCount();
                 },
                 'json'
-            );
+            ).fail(function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                toastr.error('Failed to remove item from cart. Please try again.');
+            });
         });
     </script>
     <script>
@@ -473,34 +474,75 @@
         })(jQuery);
     </script>
     <script>
+        var searchTimeout;
+        
         $j('#searching_product_data').on('keyup', function () {
-            $j('#dropdown-menu1').show();
             var searched_data = $j('#searching_product_data').val();
-            // console.log(searched_data);
-            $j.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            if (searched_data == '') {
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            if (searched_data.trim() == '') {
                 $j('#dropdown-menu1').hide();
-            } else {
-                // console.log(searched_data);
+                return;
+            }
+            
+            // Show dropdown immediately
+            $j('#dropdown-menu1').show();
+            
+            // Add loading state
+            $j('#search_product_details').html('<div class="text-center p-3"><i class="fas fa-spinner fa-spin"></i> Searching...</div>');
+            
+            // Add delay to avoid too many API calls
+            searchTimeout = setTimeout(function() {
                 $j.ajax({
-                    url: "https://www.corporatetechbd.com/searched-wise-suggessions-ajax",
-                    type: "post",
-                    // dataType: 'json',
-                    data: {
-                        searched_data: searched_data
-                    },
+                    url: "{{ route('searh.product', '') }}/" + encodeURIComponent(searched_data),
+                    type: "GET",
+                    dataType: 'json',
                     success: function (data) {
-                        // console.log('data : ' + data);
-                        $j('#search_product_details').html(data);
+                        if (data && data.length > 0) {
+                            var html = '<div class="search-suggestions">';
+                            html += '<div class="suggestion-header p-2 border-bottom"><strong>Suggestions:</strong></div>';
+                            html += '<div class="suggestion-list">';
+                            
+                            data.forEach(function(item) {
+                                html += '<div class="suggestion-item p-2 border-bottom" onclick="selectSuggestion(\'' + item.replace(/'/g, "\\'") + '\')">';
+                                html += '<i class="fas fa-search text-muted me-2"></i>';
+                                html += '<span>' + item + '</span>';
+                                html += '</div>';
+                            });
+                            
+                            html += '</div>';
+                            html += '<div class="suggestion-footer p-2 text-center">';
+                            html += '<a href="{{ route("search") }}?q=' + encodeURIComponent(searched_data) + '" class="btn btn-primary btn-sm">View All Results</a>';
+                            html += '</div>';
+                            html += '</div>';
+                            
+                            $j('#search_product_details').html(html);
+                        } else {
+                            $j('#search_product_details').html('<div class="text-center p-3 text-muted">No suggestions found</div>');
+                        }
                     },
-                    errors: function (error) {
-                        console.log(error);
+                    error: function (xhr, status, error) {
+                        console.log('Search suggestion error:', error);
+                        $j('#search_product_details').html('<div class="text-center p-3 text-danger">Error loading suggestions</div>');
                     }
                 });
+            }, 300); // 300ms delay
+        });
+        
+        // Function to select a suggestion
+        function selectSuggestion(text) {
+            $j('#searching_product_data').val(text);
+            $j('#dropdown-menu1').hide();
+            // Optionally submit the form
+            $j('#searching_product_data').closest('form').submit();
+        }
+        
+        // Hide dropdown when clicking outside
+        $j(document).on('click', function(e) {
+            if (!$j(e.target).closest('.ht-item.search').length) {
+                $j('#dropdown-menu1').hide();
             }
         });
     </script>
@@ -532,9 +574,14 @@ function addToCard(productId) {
     console.log('Adding product to cart:', productId);
     
     $j.ajax({
-        url: '/cart-add/' + productId,  // Ensure this route exists and is correct
-        type: 'GET',
+        url: '/cart-add/' + productId,
+        type: 'POST',
         dataType: 'json',
+        data: {
+            id: productId,
+            qty: 1,
+            _token: $j('meta[name="csrf-token"]').attr('content')
+        },
         success: function(response) {
             console.log('Cart add response:', response);
             if (response.success) {
@@ -557,6 +604,7 @@ function addToCard(productId) {
             console.error('AJAX Error:', xhr.responseText);
             console.error('Status:', status);
             console.error('Error:', error);
+            console.error('Response Headers:', xhr.getAllResponseHeaders());
 
             // Try to parse the JSON response from the server
             try {
@@ -564,6 +612,7 @@ function addToCard(productId) {
                 toastr.error('Error adding product to cart: ' + (response.error || error));
             } catch (e) {
                 // In case the server did not send a JSON response
+                console.error('Failed to parse JSON response:', e);
                 toastr.error('Error adding product to cart: ' + error);
             }
         }
