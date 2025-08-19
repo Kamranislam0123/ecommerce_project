@@ -422,9 +422,9 @@
                             @endif
                         </div>
 
-                        <form action="https://corporatetechbd.com/products/buy/now" method="POST" id="buy-now-form">
-                            <input type="hidden" name="_token" value="0mjyYvI6rpb4nF7kaqVtNIIw5CqZJrSv5WxDPicW"> <input
-                                type="hidden" name="product_id" value="15">
+                        <form action="{{ route('products.buy.now') }}" method="POST" id="buy-now-form">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <input type="hidden" name="selectedColor" id="selectedColor" value="">
                             <input type="hidden" name="selectedSize" id="selectedSize" value="">
                             <input type="hidden" name="product_sku" id="selectedSKU" value="">
@@ -1057,6 +1057,17 @@
             // Add active class to clicked thumbnail
             element.classList.add('active');
         }
+
+        // Initialize quantity on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('input-quantity');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            
+            if (input && addToCartBtn) {
+                // Set initial quantity
+                addToCartBtn.setAttribute('qty', input.value);
+            }
+        });
     </script>
 
 @endsection
