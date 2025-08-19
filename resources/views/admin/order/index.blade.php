@@ -85,7 +85,7 @@
      <div class="modal" id="myModal">
         <div class="modal-dialog">
           <div class="modal-content">
-            <form action="" id="modal-form" method="post">
+            <form action="" id="modal-form" method="POST">
                 @csrf
                 <!-- Modal Header -->
                 <div class="modal-header">
