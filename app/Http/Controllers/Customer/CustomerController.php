@@ -265,13 +265,51 @@ class CustomerController extends Controller
     {
         // return 'ok';
         if (Auth::guard('customer')->check()) {
-            $total_amount = Order::where('id',$id)->first()->total_amount;
-            $shipping_cost = Order::where('id',$id)->first()->shipping_cost;
-            $order = OrderDetails::where('order_id', $id)->get();
-            $invoice = Order::where('id',$id)->first();
-            return view('website.customer.customer_invoice', compact('order','total_amount','shipping_cost','invoice'));
+            $order = Order::where('id', $id)->first();
+            
+            if (!$order) {
+                return redirect()->back()->with('error', 'Order not found');
+            }
+            
+            $total_amount = $order->total_amount;
+            $shipping_cost = $order->shipping_cost;
+            $orderDetails = OrderDetails::where('order_id', $id)->get();
+            $invoice = $order;
+            $content = \App\Models\CompanyProfile::first();
+            return view('website.customer.customer_invoice', compact('orderDetails','total_amount','shipping_cost','invoice','content'));
         } else {
             return redirect()->route('home');
+        }
+    }
+
+    public function downloadPdf($id)
+    {
+        try {
+            if (Auth::guard('customer')->check()) {
+                $order = Order::where('id', $id)->first();
+                
+                if (!$order) {
+                    return redirect()->back()->with('error', 'Order not found');
+                }
+                
+                $total_amount = $order->total_amount;
+                $shipping_cost = $order->shipping_cost;
+                $orderDetails = OrderDetails::where('order_id', $id)->get();
+                $invoice = $order;
+                
+                // Get company content for dynamic data
+                $content = \App\Models\CompanyProfile::first();
+                
+                $pdf = app('dompdf.wrapper');
+                $pdf->loadView('website.customer.customer_invoice_pdf', compact('orderDetails','total_amount','shipping_cost','invoice','content'));
+                
+                // Return PDF for viewing in browser instead of downloading
+                return $pdf->stream('invoice-' . $invoice->invoice_no . '.pdf');
+            } else {
+                return redirect()->route('home');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }
 
