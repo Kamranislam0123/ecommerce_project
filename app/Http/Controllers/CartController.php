@@ -10,8 +10,35 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class CartController extends Controller
 {
+	private function calculateEffectivePrice(Product $product)
+	{
+		$basePrice = (float) $product->price;
+		$discountPercent = (float) ($product->discount ?? 0);
+		if ($discountPercent > 0) {
+			$discounted = $basePrice - ($basePrice * $discountPercent / 100);
+			return max(0, $discounted);
+		}
+		return $basePrice;
+	}
+
+	private function refreshCartPrices(): void
+	{
+		foreach (\Cart::getContent() as $item) {
+			$product = Product::select('id','price','discount')->find($item->id);
+			if ($product) {
+				$newPrice = $this->calculateEffectivePrice($product);
+				if ($item->price != $newPrice) {
+					\Cart::update($item->id, [
+						'price' => $newPrice,
+					]);
+				}
+			}
+		}
+	}
+
     public function cartList()
     {
+        $this->refreshCartPrices();
         $cartItems = \Cart::getContent();
         // dd($cartItems);
         return view('website.cart', compact('cartItems'));
@@ -22,16 +49,20 @@ class CartController extends Controller
     //    dd($request->all());
             $total_item = \Cart::getContent()->count();
             if($total_item <100){
+                $product = Product::find($request->id);
+                if($product){
+                $effectivePrice = $this->calculateEffectivePrice($product);
                 \Cart::add([
-                    'id' => $request->id,
-                    'name' => $request->name,
-                    'price' => '500',
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $effectivePrice,
                     'quantity' => 1,
                     'attributes' => array(
-                        'image' => $request->image,
-                        'slug' => $request->slug,
+                        'image' => $product->image ?? $request->image,
+                        'slug' => $product->slug ?? $request->slug,
                     )
                 ]);
+                }
             }
             
         
@@ -40,10 +71,26 @@ class CartController extends Controller
 
     public function addToCartAjax(Request $request, $id)
     {
+       \Log::info('Cart add request received', ['id' => $id, 'request' => $request->all()]);
+       
        $product = Product::where('id', $id)->first();
        
        if (!$product) {
-           return response()->json(['error' => 'Product not found'], 404);
+           return response()->json(['success' => false, 'error' => 'Product not found'], 404);
+       }
+       
+       // Get quantity from request, default to 1
+       $quantity = $request->input('qty', 1);
+       
+       // Validate quantity
+       if ($quantity < 1 || $quantity > 100) {
+           return response()->json(['success' => false, 'error' => 'Invalid quantity. Must be between 1 and 100.'], 400);
+       }
+       
+       // Check stock availability
+       $stock = $product->inventory ? $product->inventory->purchage : 0;
+       if ($quantity > $stock) {
+           return response()->json(['success' => false, 'error' => 'Requested quantity not available in stock'], 400);
        }
        
        $total_item = \Cart::getContent()->count();
@@ -57,7 +104,7 @@ class CartController extends Controller
                 \Cart::update($product->id, [
                     'quantity' => [
                         'relative' => true,
-                        'value' => 1
+                        'value' => $quantity
                     ]
                 ]);
             } else {
@@ -65,23 +112,32 @@ class CartController extends Controller
                 \Cart::add([
                     'id' => $product->id,
                     'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => 1,
+                    'price' => $this->calculateEffectivePrice($product),
+                    'quantity' => $quantity,
                     'attributes' => array(
                         'image' => $product->image,
                         'slug' => $product->slug,
                     )
                 ]);
             }
-            
-            return response()->json(['success' => 'Cart added successfully']);
+                        \Log::info('Cart item added successfully', [
+                'product_id' => $product->id, 
+                'cart_count' => \Cart::getContent()->count(),
+                'cart_total' => \Cart::getTotal(),
+                'cart_items' => \Cart::getContent()->toArray()
+            ]);
+            return response()->json(['success' => true, 'message' => 'Cart added successfully']);
           
         } catch (\Throwable $th) {
-            \Log::error('Cart add error: ' . $th->getMessage());
-            return response()->json(['error' => 'Error adding to cart: ' . $th->getMessage()], 500);
+            \Log::error('Cart add error: ' . $th->getMessage(), [
+                'trace' => $th->getTraceAsString(),
+                'product_id' => $id,
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'error' => 'Error adding to cart: ' . $th->getMessage()], 500);
         }
        } else {
-           return response()->json(['error' => 'Cart limit reached (max 100 items)'], 400);
+           return response()->json(['success' => false, 'error' => 'Cart limit reached (max 100 items)'], 400);
        }
     }
 
@@ -185,7 +241,7 @@ class CartController extends Controller
     public function removeCartAjax( $id)
     {
         \Cart::remove($id);
-        $remove = session()->flash('remove', 'Item Cart Remove Successfully !');
+        session()->flash('remove', 'Item Cart Remove Successfully !');
 
         return response()->json(['success' => 'Cart remove successfully']);
     }
@@ -199,10 +255,12 @@ class CartController extends Controller
         return redirect()->route('cart.list');
     }
     public function cartAllData(){
+        $this->refreshCartPrices();
         $cartAll = \Cart::getContent();
         return response()->json($cartAll);
     }
     public function cartContent(){
+        $this->refreshCartPrices();
         $cart['total_amount'] = \Cart::getTotal();
         $cart['total_item'] = \Cart::getTotalQuantity();
         
@@ -312,6 +370,54 @@ class CartController extends Controller
         }
         
         return response()->json(['error' => 'Item not found in cart'], 404);
+    }
+    
+    public function buyNow(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_id' => 'required|exists:products,id',
+                'qty' => 'required|integer|min:1|max:100',
+            ]);
+
+            $product = Product::find($request->product_id);
+            if (!$product) {
+                return redirect()->back()->with('error', 'Product not found');
+            }
+
+            // Check stock availability
+            $stock = $product->inventory ? $product->inventory->purchage : 0;
+            if ($request->qty > $stock) {
+                return redirect()->back()->with('error', 'Requested quantity not available in stock');
+            }
+
+            // Clear existing cart and add only this product
+            \Cart::clear();
+            
+            // Add the product to cart
+            $effectivePrice = $this->calculateEffectivePrice($product);
+            \Cart::add([
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $effectivePrice,
+                'quantity' => $request->qty,
+                'attributes' => array(
+                    'image' => $product->image,
+                    'slug' => $product->slug,
+                )
+            ]);
+
+            // Set session flag for buy now
+            session()->flash('buy_now', true);
+            
+            // Redirect to checkout
+            return redirect()->route('checkout.user');
+            
+        } catch (\Throwable $th) {
+            \Log::error('Buy now error: ' . $th->getMessage());
+            return redirect()->back()->with('error', 'Failed to process buy now request');
+        }
     }
     
     
