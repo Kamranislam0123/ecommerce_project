@@ -34,4 +34,18 @@ class OfferController extends Controller
         
         return view('website.offer-details', compact('offer', 'products'));
     }
+
+    public function debug($id)
+    {
+        $offer = Offer::findOrFail($id);
+        
+        return response()->json([
+            'offer_id' => $offer->id,
+            'title' => $offer->title,
+            'image' => $offer->image,
+            'image_path' => asset($offer->image),
+            'image_exists' => file_exists(public_path($offer->image)),
+            'all_offers' => Offer::select('id', 'title', 'image')->get()
+        ]);
+    }
 }
