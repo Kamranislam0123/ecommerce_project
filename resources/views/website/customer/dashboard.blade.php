@@ -435,18 +435,18 @@
             <i class="fas fa-list"></i>
             <span>Orders</span>
         </a>
-        <a href="#" class="dashboard-nav-item {{ session('active_tab') == 'quotes' ? 'active' : '' }}" data-tab="quotes">
+        <!-- <a href="#" class="dashboard-nav-item {{ session('active_tab') == 'quotes' ? 'active' : '' }}" data-tab="quotes">
             <i class="fas fa-clipboard"></i>
             <span>Quotes</span>
-        </a>
+        </a> -->
         <a href="#" class="dashboard-nav-item {{ session('active_tab') == 'addresses' ? 'active' : '' }}" data-tab="addresses">
             <i class="fas fa-map-marker-alt"></i>
             <span>Addresses</span>
         </a>
-        <a href="#" class="dashboard-nav-item {{ session('active_tab') == 'saved' ? 'active' : '' }}" data-tab="saved">
+        <!-- <a href="#" class="dashboard-nav-item {{ session('active_tab') == 'saved' ? 'active' : '' }}" data-tab="saved">
             <i class="fas fa-heart"></i>
             <span>Saved List</span>
-        </a>
+        </a> -->
         <!-- <a href="#" class="dashboard-nav-item" data-tab="pc">
             <i class="fas fa-desktop"></i>
             <span>Saved PC</span>
