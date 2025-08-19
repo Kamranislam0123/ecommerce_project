@@ -58,18 +58,17 @@
                                 </td>
                                 <td class="text-center">
                                     {{-- <a href="#" class="btn-edit edit-btn"><i class="fas fa-pencil-alt"></i></a> --}}
-                                    <button type="submit" class="btn btn-delete" onclick="deleteUser({{ $item->id }})"><i class="far fa-trash-alt"></i></button>
-                                        <form id="delete-form-{{ $item->id }}" action="#"
-                                            method="POST" style="display: none;">
+                                    @if ($item->id != 1)
+                                        <button type="submit" class="btn btn-delete" onclick="deleteUser({{ $item->id }})"><i class="far fa-trash-alt"></i></button>
+                                        <form id="delete-form-{{ $item->id }}" action="#" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
-                                        @if ($item->id != 1)
-                                        <a href="{{route('permission.edit',$item->id)}}" class="btn-edit edit-btn"><i class="fas fa-users"></i></a>
-                                        <a href="{{route('action.permission',$item->id)}}"><i class="fas fa-medkit"></i></a>
-                                        @endif
-                                        
-                                        
+                                    @endif
+                                    <a href="{{route('permission.edit',$item->id)}}" class="btn-edit edit-btn" title="Edit Permissions"><i class="fas fa-users"></i></a>
+                                    <a href="{{route('action.permission',$item->id)}}" title="Action Permissions"><i class="fas fa-medkit"></i></a>
+                                     
+                                     
                                 </td>
                             </tr>  
                             @endforeach
